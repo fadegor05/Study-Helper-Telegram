@@ -1,6 +1,24 @@
 version: '3.9'
 
 services:
+  mongo:
+    image: mongo:latest
+    container_name: study-helper-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASS}
+    env_file:
+      - .env
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodata:/data/db
+
   bot:
     container_name: study-helper-bot
+    depends_on:
+      - mongo
     build: .
+
+volumes:
+  mongodata:

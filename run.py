@@ -4,11 +4,14 @@ import sys
 
 from aiogram import Bot, Dispatcher
 
+from app.database import mongo_connection, mongo_init
 from app.handlers.router import router
-from app.core.config import TELEGRAM_TOKEN
+from app.core.config import TELEGRAM_TOKEN, MONGO_DATABASE_NAME
 
 
 async def main() -> None:
+    connection = await mongo_connection()
+    await mongo_init(connection)
     bot = Bot(token=TELEGRAM_TOKEN)
     dp = Dispatcher()
     dp.include_routers(router)
