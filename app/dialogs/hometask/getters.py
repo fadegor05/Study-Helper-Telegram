@@ -1,7 +1,9 @@
+from datetime import datetime, timedelta
+
 from aiogram_dialog import DialogManager
 
 from app.crud.hometask import get_hometasks_all, get_hometask_by_uuid
-from app.crud.lesson import get_lesson_by_uuid
+from app.crud.lesson import get_lesson_by_uuid, get_lessons_all
 from aiogram_dialog.widgets.kbd import Url
 from aiogram_dialog.widgets.text import Const
 
@@ -25,5 +27,30 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
         'is_completed': 'Выполнено ✅' if is_completed else 'Не выполнено ⏳',
         'is_completed_button': '✅ Выполнено' if not is_completed else '❌ Отменить выполнение',
         'task': hometask.get('task'),
+        'date': datetime.fromisoformat(hometask.get('date')).strftime('%d.%m'),
         'books': '\n'.join([ f'{book} - {books.get(book)}' for book in books])
+    }
+
+
+async def get_lessons(dialog_manager: DialogManager, **kwargs):
+    lessons = await get_lessons_all()
+    return {
+        'lessons': lessons
+    }
+
+
+async def get_dates(dialog_manager: DialogManager, **kwargs):
+    dates = []
+    now = datetime.now()
+    start_datetime = datetime(now.year, now.month, now.day, 10, 0, 0)
+    end_datetime = start_datetime + timedelta(days=9)
+
+    current_datetime = start_datetime
+    while current_datetime <= end_datetime:
+        dates.append({'date': current_datetime, 'date_iso': current_datetime.isoformat(),
+                      'date_str': current_datetime.strftime('%d.%m')})
+        current_datetime += timedelta(days=1)
+
+    return {
+        'dates': dates
     }

@@ -9,11 +9,12 @@ async def get_lessons_all():
     lesson_collection = await mongo_get_collection(connection, 'lessons')
     return lesson_collection.find({})
 
+
 async def create_lesson(name: str, classroom: str, building: int, books: Dict[str, str]):
     connection = await mongo_connection()
     lesson_collection = await mongo_get_collection(connection, 'lessons')
     lesson_collection.insert_one({
-        'uuid': uuid4(),
+        'uuid': str(uuid4()),
         'name': name,
         'classroom': classroom,
         'building': building,

@@ -7,3 +7,11 @@ class HometaskMenu(StatesGroup):
 
 class HometaskInfo(StatesGroup):
     info_hometask = State()
+
+
+class HometaskCreate(StatesGroup):
+    lesson_hometask = State()
+    date_hometask = State()
+    task_hometask = State()
+    image_hometask = State()
+    confirm_hometask = State()

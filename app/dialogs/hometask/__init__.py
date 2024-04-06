@@ -10,5 +10,11 @@ def menu_dialogs():
         ),
         Dialog(
             windows.hometask_info_window(),
+        ),
+        Dialog(
+            windows.hometask_lesson_window(),
+            windows.hometask_date_window(),
+            windows.hometask_task_window(),
+            windows.hometask_images_window(),
         )
     ]

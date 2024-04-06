@@ -1,3 +1,4 @@
+from typing import List
 from uuid import uuid4
 from datetime import datetime
 
@@ -18,17 +19,18 @@ async def get_hometask_by_uuid(hometask_uuid: str):
     return hometask
 
 
-async def create_hometask(lesson_uuid: str, task: str, date: datetime):
+async def create_hometask(lesson_uuid: str, task: str, date: datetime, images: List[str]):
     connection = await mongo_connection()
     hometask_collection = await mongo_get_collection(connection, 'hometasks')
     lesson = await get_lesson_by_uuid(lesson_uuid)
     hometask_collection.insert_one({
-        'uuid': uuid4(),
+        'uuid': str(uuid4()),
         'lesson_uuid': lesson_uuid,
         'lesson': lesson.get('name'),
         'task': task,
         'date': date,
-        'is_completed': False
+        'completed_by': [],
+        'images': images
     })
 
 
