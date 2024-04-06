@@ -5,6 +5,7 @@ from aiogram_dialog.widgets.input import MessageInput, TextInput
 
 from app.crud.hometask import change_hometask_status_by_uuid_and_user_id, create_hometask
 from app.crud.lesson import create_lesson
+from app.crud.user import is_user_editor_by_telegram_id
 from app.dialogs.hometask.states import HometaskInfo, HometaskCreate
 
 
@@ -19,6 +20,10 @@ async def change_hometask_status(c: CallbackQuery, widget: Button, manager: Dial
 
 
 async def on_create_hometask(c: CallbackQuery, widget: Button, manager: DialogManager):
+    user_id = manager.middleware_data.get('event_chat').id
+    if not await is_user_editor_by_telegram_id(user_id):
+        await c.answer('У вас недостаточно прав для этого ❌')
+        return
     await manager.start(HometaskCreate.lesson_hometask)
 
 
