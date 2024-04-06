@@ -7,6 +7,8 @@ from app.crud.hometask import get_hometasks_all, get_hometask_by_uuid
 from app.crud.lesson import get_lesson_by_uuid, get_lessons_all
 from aiogram_dialog.widgets.kbd import Url
 from aiogram_dialog.widgets.text import Const
+from aiogram_dialog.api.entities import MediaAttachment, MediaId
+from aiogram.enums.content_type import ContentType
 
 
 async def get_hometasks(dialog_manager: DialogManager, **kwargs):
@@ -35,7 +37,8 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
         'is_completed_button': '✅ Выполнено' if not is_completed else '❌ Отменить выполнение',
         'task': hometask.get('task'),
         'date': datetime.fromisoformat(hometask.get('date')).strftime('%d.%m'),
-        'books': '\n'.join([ f'{book} - {books.get(book)}' for book in books])
+        'books': '\n'.join([f'{book} - {books.get(book)}' for book in books]),
+        'image': MediaAttachment(ContentType.PHOTO, file_id=MediaId(hometask.get('images')[-1]))
     }
 
 

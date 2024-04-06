@@ -3,6 +3,7 @@ from aiogram_dialog.widgets.kbd import Cancel, Button, Back, Next
 from aiogram_dialog.widgets.text import Const, Format
 from aiogram_dialog.widgets.input import TextInput, MessageInput
 from aiogram.enums.content_type import ContentType
+from aiogram_dialog.widgets.media import DynamicMedia
 
 from app.dialogs.hometask import states, keyboards, callbacks, getters
 
@@ -20,6 +21,7 @@ def hometask_window():
 
 def hometask_info_window():
     return Window(
+        DynamicMedia('image'),
         Format('{date} - {lesson} 🗒️\n{is_completed}\n\n{task}\n\nМатериалы 📚\n{books}'),
         Button(Format('{is_completed_button}'), 'status_change_hometask_button', callbacks.change_hometask_status),
         Button(Const('✏️ Редактировать'), 'hometask_edit_button'),
