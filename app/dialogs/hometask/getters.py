@@ -1,3 +1,4 @@
+from copy import deepcopy
 from datetime import datetime, timedelta
 
 from aiogram_dialog import DialogManager
@@ -9,7 +10,13 @@ from aiogram_dialog.widgets.text import Const
 
 
 async def get_hometasks(dialog_manager: DialogManager, **kwargs):
-    hometasks = await get_hometasks_all()
+    user_id = dialog_manager.middleware_data.get('event_chat').id
+
+    hometasks = []
+    for hometask in await get_hometasks_all():
+        hometask.update(date=datetime.fromisoformat(hometask.get('date')).strftime('%d.%m'),
+                        is_completed='✅' if user_id in hometask.get('completed_by') else '⏳')
+        hometasks.append(hometask)
     return {
         'hometasks': hometasks
     }

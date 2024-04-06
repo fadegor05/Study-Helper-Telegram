@@ -6,7 +6,7 @@ from aiogram_dialog.widgets.text import Format
 def paginated_hometasks(on_click):
     return ScrollingGroup(
         Select(
-            Format('⏳ {item[date]} - {item[lesson]}'),
+            Format('{item[is_completed]} {item[date]} - {item[lesson]}'),
             id='s_scroll_hometasks',
             item_id_getter=operator.itemgetter('uuid'),
             items='hometasks',
