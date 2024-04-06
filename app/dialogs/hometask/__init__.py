@@ -8,4 +8,7 @@ def menu_dialogs():
         Dialog(
             windows.hometask_window(),
         ),
+        Dialog(
+            windows.hometask_info_window(),
+        )
     ]
