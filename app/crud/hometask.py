@@ -6,6 +6,21 @@ from app.crud.lesson import get_lesson_by_uuid
 from app.database import mongo_connection, mongo_get_collection
 
 
+async def get_amount_hometasks_uncompleted(telegram_id: int):
+    connection = await mongo_connection()
+    hometask_collection = await mongo_get_collection(connection, 'hometasks')
+    return hometask_collection.count_documents({'completed_by': {'$nin': [telegram_id]}})
+
+
+async def get_hometasks_all_sorted(telegram_id: int):
+    connection = await mongo_connection()
+    hometask_collection = await mongo_get_collection(connection, 'hometasks')
+    uncompleted = list(hometask_collection.find({'completed_by': {'$nin': [telegram_id]}}).sort({'completed_by': 1, 'date': 1}))
+    completed = list(hometask_collection.find({'completed_by': {'$in': [telegram_id]}}).sort({'completed_by': 1, 'date': 1}))
+    for hometask in completed:
+        uncompleted.append(hometask)
+    return uncompleted
+
 async def get_hometasks_all():
     connection = await mongo_connection()
     hometask_collection = await mongo_get_collection(connection, 'hometasks')
