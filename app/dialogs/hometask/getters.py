@@ -3,24 +3,23 @@ from datetime import datetime, timedelta
 
 from aiogram_dialog import DialogManager
 
-from app.crud.hometask import get_hometasks_all, get_hometask_by_uuid
+from app.crud.hometask import get_hometask_by_uuid, get_hometasks_all_sorted, get_amount_hometasks_uncompleted
 from app.crud.lesson import get_lesson_by_uuid, get_lessons_all
-from aiogram_dialog.widgets.kbd import Url
-from aiogram_dialog.widgets.text import Const
 from aiogram_dialog.api.entities import MediaAttachment, MediaId
 from aiogram.enums.content_type import ContentType
 
 
 async def get_hometasks(dialog_manager: DialogManager, **kwargs):
-    user_id = dialog_manager.middleware_data.get('event_chat').id
-
+    user_id = int(dialog_manager.middleware_data.get('event_chat').id)
+    uncompleted_tasks_amount = await get_amount_hometasks_uncompleted(user_id)
     hometasks = []
-    for hometask in await get_hometasks_all():
+    for hometask in await get_hometasks_all_sorted(user_id):
         hometask.update(date=datetime.fromisoformat(hometask.get('date')).strftime('%d.%m'),
                         is_completed='✅' if user_id in hometask.get('completed_by') else '⏳')
         hometasks.append(hometask)
     return {
-        'hometasks': hometasks
+        'hometasks': hometasks,
+        'uncompleted_amount': uncompleted_tasks_amount
     }
 
 
