@@ -28,7 +28,8 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
     hometask = await get_hometask_by_uuid(hometask_uuid)
     user_id = dialog_manager.middleware_data.get('event_chat').id
     lesson = await get_lesson_by_uuid(hometask.get('lesson_uuid'))
-    books = lesson.get('books')
+    books_list = lesson.get('books')
+    books = '\n'.join([f'{book} - {books_list.get(book)}' for book in books_list]) if books_list else 'Отсутствуют 📦'
     is_completed = True if user_id in hometask.get('completed_by') else False
     return {
         'lesson': hometask.get('lesson'),
@@ -36,8 +37,8 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
         'is_completed_button': '✅ Выполнено' if not is_completed else '❌ Отменить выполнение',
         'task': hometask.get('task'),
         'date': datetime.fromisoformat(hometask.get('date')).strftime('%d.%m'),
-        'books': '\n'.join([f'{book} - {books.get(book)}' for book in books]),
-        'image': MediaAttachment(ContentType.PHOTO, file_id=MediaId(hometask.get('images')[-1]))
+        'books': books,
+        'image_last': MediaAttachment(ContentType.PHOTO, file_id=MediaId(hometask.get('images')[-1])),
     }
 
 

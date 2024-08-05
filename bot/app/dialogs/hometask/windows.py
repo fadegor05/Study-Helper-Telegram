@@ -21,7 +21,7 @@ def hometask_window():
 
 def hometask_info_window():
     return Window(
-        DynamicMedia('image'),
+        DynamicMedia('image_last'),
         Format('{date} - {lesson} 🗒️\n{is_completed}\n\n{task}\n\nМатериалы 📚\n{books}'),
         Button(Format('{is_completed_button}'), 'status_change_hometask_button', callbacks.change_hometask_status),
         Button(Const('✏️ Редактировать'), 'hometask_edit_button'),

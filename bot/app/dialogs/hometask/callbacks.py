@@ -1,15 +1,22 @@
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, Message, InputMediaPhoto
+from aiogram.utils.media_group import MediaGroupBuilder
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.kbd import Select, Button
 from aiogram_dialog.widgets.input import MessageInput, TextInput
 
-from app.crud.hometask import change_hometask_status_by_uuid_and_user_id, create_hometask
-from app.crud.lesson import create_lesson
+from app.crud.hometask import change_hometask_status_by_uuid_and_user_id, create_hometask, get_hometask_by_uuid
 from app.crud.user import is_user_editor_by_telegram_id
 from app.dialogs.hometask.states import HometaskInfo, HometaskCreate
 
 
 async def on_chosen_hometask(c: CallbackQuery, widget: Select, manager: DialogManager, hometask_uuid: str, **kwargs):
+    hometask = await get_hometask_by_uuid(hometask_uuid)
+    media_list = []
+    for image in hometask.get('images')[:-1]:
+        media_list.append(InputMediaPhoto(media=image))
+    if len(media_list) > 0:
+        media_group = MediaGroupBuilder(media_list)
+        await c.bot.send_media_group(chat_id=c.from_user.id, media=media_group.build())
     await manager.start(HometaskInfo.info_hometask, {'hometask_uuid': hometask_uuid})
 
 
