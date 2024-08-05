@@ -16,9 +16,11 @@ services:
 
   bot:
     container_name: study-helper-bot
+    env_file:
+      - .env
     depends_on:
       - mongo
-    build: .
+    build: ./bot
 
 volumes:
   mongodata:
