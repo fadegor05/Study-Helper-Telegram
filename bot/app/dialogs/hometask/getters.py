@@ -1,7 +1,9 @@
 from copy import deepcopy
 from datetime import datetime, timedelta
+from typing import Dict
 
 from aiogram_dialog import DialogManager
+from aiogram_dialog.widgets.common import Whenable
 
 from app.crud.hometask import get_hometask_by_uuid, get_hometasks_all_sorted, get_amount_hometasks_uncompleted
 from app.crud.lesson import get_lesson_by_uuid, get_lessons_all
@@ -29,8 +31,11 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
     user_id = dialog_manager.middleware_data.get('event_chat').id
     lesson = await get_lesson_by_uuid(hometask.get('lesson_uuid'))
     books_list = lesson.get('books')
-    books = '\n'.join([f'{book} - {books_list.get(book)}' for book in books_list]) if books_list else 'Отсутствуют 📦'
+    books = '\n'.join([f'{book} - {books_list.get(book)}' for book in books_list]) if books_list else '...'
     is_completed = True if user_id in hometask.get('completed_by') else False
+    image_last = None
+    if hometask.get('images') and len(hometask.get('images')) > 0:
+        image_last = MediaAttachment(ContentType.PHOTO, file_id=MediaId(hometask.get('images')[-1]))
     return {
         'lesson': hometask.get('lesson'),
         'is_completed': 'Выполнено ✅' if is_completed else 'Не выполнено ⏳',
@@ -38,7 +43,7 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
         'task': hometask.get('task'),
         'date': datetime.fromisoformat(hometask.get('date')).strftime('%d.%m'),
         'books': books,
-        'image_last': MediaAttachment(ContentType.PHOTO, file_id=MediaId(hometask.get('images')[-1])),
+        'image_last': image_last,
     }
 
 

@@ -12,11 +12,12 @@ from app.dialogs.hometask.states import HometaskInfo, HometaskCreate
 async def on_chosen_hometask(c: CallbackQuery, widget: Select, manager: DialogManager, hometask_uuid: str, **kwargs):
     hometask = await get_hometask_by_uuid(hometask_uuid)
     media_list = []
-    for image in hometask.get('images')[:-1]:
-        media_list.append(InputMediaPhoto(media=image))
-    if len(media_list) > 0:
-        media_group = MediaGroupBuilder(media_list)
-        await c.bot.send_media_group(chat_id=c.from_user.id, media=media_group.build())
+    if hometask.get('images'):
+        for image in hometask.get('images')[:-1]:
+            media_list.append(InputMediaPhoto(media=image))
+        if len(media_list) > 0:
+            media_group = MediaGroupBuilder(media_list)
+            await c.bot.send_media_group(chat_id=c.from_user.id, media=media_group.build())
     await manager.start(HometaskInfo.info_hometask, {'hometask_uuid': hometask_uuid})
 
 
