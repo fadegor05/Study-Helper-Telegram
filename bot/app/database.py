@@ -8,7 +8,8 @@ from app.core.config import MONGO_URL, MONGO_DATABASE_NAME
 COLLECTIONS = [
     'users',
     'lessons',
-    'hometasks'
+    'hometasks',
+    'schedule',
 ]
 
 
