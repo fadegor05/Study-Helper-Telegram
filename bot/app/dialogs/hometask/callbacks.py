@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from aiogram.types import CallbackQuery, Message, InputMediaPhoto
 from aiogram.utils.media_group import MediaGroupBuilder
 from aiogram_dialog import DialogManager
@@ -5,6 +7,7 @@ from aiogram_dialog.widgets.kbd import Select, Button
 from aiogram_dialog.widgets.input import MessageInput, TextInput
 
 from app.crud.hometask import change_hometask_status_by_uuid_and_user_id, create_hometask, get_hometask_by_uuid
+from app.crud.schedule import get_lesson_weekdays_by_uuid
 from app.crud.user import is_user_editor_by_telegram_id
 from app.dialogs.hometask.states import HometaskInfo, HometaskCreate
 
@@ -38,6 +41,24 @@ async def on_create_hometask(c: CallbackQuery, widget: Button, manager: DialogMa
 async def on_chosen_lesson(c: CallbackQuery, widget: Select, manager: DialogManager, lesson_uuid: str, **kwargs):
     manager.dialog_data.update(lesson_uuid=lesson_uuid)
     await manager.switch_to(HometaskCreate.date_hometask)
+
+
+async def on_chosen_soon_date(c: CallbackQuery, widget: Button, manager: DialogManager):
+    lesson_uuid = manager.dialog_data.get('lesson_uuid')
+    lesson_weekdays = await get_lesson_weekdays_by_uuid(lesson_uuid)
+    date = None
+    now = datetime.now() + timedelta(days=1)
+    start_datetime = datetime(now.year, now.month, now.day, 10, 0, 0)
+    end_datetime = start_datetime + timedelta(days=7)
+
+    current_datetime = start_datetime
+    while current_datetime <= end_datetime:
+        if current_datetime.isoweekday() in lesson_weekdays:
+            date = current_datetime.isoformat()
+            break
+        current_datetime += timedelta(days=1)
+    manager.dialog_data.update(date=date)
+    await manager.switch_to(HometaskCreate.task_hometask)
 
 
 async def on_chosen_date(c: CallbackQuery, widget: Select, manager: DialogManager, date: str, **kwargs):

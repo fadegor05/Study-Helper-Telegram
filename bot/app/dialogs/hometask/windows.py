@@ -44,7 +44,7 @@ def hometask_lesson_window():
 def hometask_date_window():
     return Window(
         Const('Выберите на какой день вы хотите добавить домашнее задание 🗓️'),
-        Button(Const('⏳ Ближайший урок'), 'hometask_date_soon'),
+        Button(Const('⏳ Следующий урок'), 'hometask_date_soon', callbacks.on_chosen_soon_date),
         keyboards.paginated_dates(callbacks.on_chosen_date),
         Back(Const('⬅️ Назад')),
         state=states.HometaskCreate.date_hometask,
