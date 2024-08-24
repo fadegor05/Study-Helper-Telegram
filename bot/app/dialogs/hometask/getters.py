@@ -10,6 +10,8 @@ from app.crud.lesson import get_lesson_by_uuid, get_lessons_all
 from aiogram_dialog.api.entities import MediaAttachment, MediaId
 from aiogram.enums.content_type import ContentType
 
+from app.crud.schedule import get_lesson_weekdays_by_uuid
+
 
 async def get_hometasks(dialog_manager: DialogManager, **kwargs):
     user_id = int(dialog_manager.middleware_data.get('event_chat').id)
@@ -55,15 +57,18 @@ async def get_lessons(dialog_manager: DialogManager, **kwargs):
 
 
 async def get_dates(dialog_manager: DialogManager, **kwargs):
+    lesson_uuid = dialog_manager.dialog_data.get('lesson_uuid')
+    lesson_weekdays = await get_lesson_weekdays_by_uuid(lesson_uuid)
     dates = []
     now = datetime.now()
     start_datetime = datetime(now.year, now.month, now.day, 10, 0, 0)
-    end_datetime = start_datetime + timedelta(days=9)
+    end_datetime = start_datetime + timedelta(days=10)
 
     current_datetime = start_datetime
     while current_datetime <= end_datetime:
-        dates.append({'date': current_datetime, 'date_iso': current_datetime.isoformat(),
-                      'date_str': current_datetime.strftime('%d.%m')})
+        if current_datetime.isoweekday() in lesson_weekdays:
+            dates.append({'date': current_datetime, 'date_iso': current_datetime.isoformat(),
+                          'date_str': current_datetime.strftime('%d.%m')})
         current_datetime += timedelta(days=1)
 
     return {
