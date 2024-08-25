@@ -1,4 +1,4 @@
-from . import start, hometask, schedule
+from . import start, hometask, schedule, settings
 
 
 def get_dialogs():
@@ -6,4 +6,5 @@ def get_dialogs():
         *start.menu_dialogs(),
         *hometask.menu_dialogs(),
         *schedule.menu_dialogs(),
+        *settings.menu_dialogs(),
     ]

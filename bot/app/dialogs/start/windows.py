@@ -12,6 +12,7 @@ def start_window():
               '📝\n\nВыберите то, что вас интересует 🤔'),
         Button(Const('📑 Домашнее задание'), 'homework_button', callbacks.on_chosen_hometask),
         Button(Const('📆 Расписание'), 'schedule_button', callbacks.on_chosen_schedule),
+        Button(Const('⚙️ Настройки'), 'settings_button', callbacks.on_chosen_settings),
         Cancel(Const('❌ Выход')),
         state=states.StartMenu.select_menu,
     )
