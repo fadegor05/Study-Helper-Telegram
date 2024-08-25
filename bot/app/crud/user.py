@@ -25,3 +25,15 @@ async def create_user(telegram_id: int, username: str, specialization: str = Non
         'hometask_notification': True,
         'schedule_notification': True
     })
+
+
+async def set_hometask_notification_by_telegram_id(telegram_id:int, state: bool):
+    connection = await mongo_connection()
+    user_collection = await mongo_get_collection(connection, 'users')
+    user_collection.update_one({'telegram_id': telegram_id}, {'$set': {'hometask_notification': state}})
+
+
+async def set_schedule_notification_by_telegram_id(telegram_id:int, state: bool):
+    connection = await mongo_connection()
+    user_collection = await mongo_get_collection(connection, 'users')
+    user_collection.update_one({'telegram_id': telegram_id}, {'$set': {'schedule_notification': state}})
