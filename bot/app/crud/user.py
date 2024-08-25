@@ -22,5 +22,6 @@ async def create_user(telegram_id: int, username: str, specialization: str = Non
     user_collection.insert_one({
         'telegram_id': telegram_id,
         'username': username,
-        'specialization': specialization
+        'homework_notification': True,
+        'schedule_notification': True
     })
