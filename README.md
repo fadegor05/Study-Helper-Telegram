@@ -60,7 +60,7 @@
 telegram_id: int
 username: str
 is_editor: boolean
-homework_notification: boolean
+hometask_notification: boolean
 schedule_notification: boolean
 ```
 
