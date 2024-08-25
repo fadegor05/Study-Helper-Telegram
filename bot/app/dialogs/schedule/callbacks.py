@@ -20,6 +20,6 @@ async def on_chosen_today(c: CallbackQuery, widget: Button, manager: DialogManag
 
 async def on_chosen_tomorrow(c: CallbackQuery, widget: Button, manager: DialogManager):
     day = datetime.today().isoweekday() + 1
-    if day == 7:
+    if day == 8:
         day = 1
     await manager.start(ScheduleInfo.info_schedule, {'schedule_day': day})
