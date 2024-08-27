@@ -10,7 +10,7 @@ from app.dialogs.hometask import states, keyboards, callbacks, getters
 
 def hometask_window():
     return Window(
-        Format('Домашнее задание 📑\n\n📋 Невыполненых заданий: {uncompleted_amount}\n\nВыберите интересующее вас задание 📚'),
+        Format('*Домашнее задание* 📑\n\n📋 Невыполненых заданий: {uncompleted_amount}\n\nВыберите интересующее вас задание 📚'),
         keyboards.paginated_hometasks(callbacks.on_chosen_hometask),
         Button(Const('📝 Создать задание'), 'hometask_create_button', callbacks.on_create_hometask),
         Cancel(Const('⬅️ Назад')),
