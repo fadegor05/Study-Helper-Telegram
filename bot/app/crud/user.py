@@ -16,6 +16,11 @@ async def user_exits_by_telegram_id(telegram_id: int) -> bool:
     return True if await get_user_by_telegram_id(telegram_id) else False
 
 
+async def have_user_access_by_telegram_id(telegram_id: int) -> bool:
+    user = await get_user_by_telegram_id(telegram_id)
+    return user.get('have_access')
+
+
 async def create_user(telegram_id: int, username: str, specialization: str = None):
     connection = await mongo_connection()
     user_collection = await mongo_get_collection(connection, 'users')
@@ -23,7 +28,8 @@ async def create_user(telegram_id: int, username: str, specialization: str = Non
         'telegram_id': telegram_id,
         'username': username,
         'hometask_notification': True,
-        'schedule_notification': True
+        'schedule_notification': True,
+        'have_access': False
     })
 
 
