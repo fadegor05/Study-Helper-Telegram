@@ -82,10 +82,11 @@ async def on_sent_images(m: Message, widget: MessageInput, manager: DialogManage
 
 
 async def on_done_create_hometask(c: CallbackQuery, widget: Button, manager: DialogManager):
+    user_id = manager.middleware_data.get('event_chat').id
     lesson_uuid = manager.dialog_data.get('lesson_uuid')
     date = manager.dialog_data.get('date')
     task = manager.dialog_data.get('task')
     images = manager.dialog_data.get('images')
-    await create_hometask(lesson_uuid, task, date, images)
+    await create_hometask(lesson_uuid, task, date, images, user_id)
     await c.answer('Задание было успешно добавлено ✅')
     await manager.done()
