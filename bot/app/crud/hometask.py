@@ -34,7 +34,7 @@ async def get_hometask_by_uuid(hometask_uuid: str):
     return hometask
 
 
-async def create_hometask(lesson_uuid: str, task: str, date: datetime, images: List[str]):
+async def create_hometask(lesson_uuid: str, task: str, date: datetime, images: List[str], author_id: int):
     connection = await mongo_connection()
     hometask_collection = await mongo_get_collection(connection, 'hometasks')
     lesson = await get_lesson_by_uuid(lesson_uuid)
@@ -45,7 +45,8 @@ async def create_hometask(lesson_uuid: str, task: str, date: datetime, images: L
         'task': task,
         'date': date,
         'completed_by': [],
-        'images': images
+        'images': images,
+        'author_id': author_id
     })
 
 
