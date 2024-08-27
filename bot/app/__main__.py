@@ -3,6 +3,7 @@ import logging
 import sys
 
 from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
 from apscheduler.triggers.cron import CronTrigger
 
 from app.apsched.hometask import hometask_notification
@@ -17,7 +18,8 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 async def main() -> None:
     connection = await mongo_connection()
     await mongo_init(connection)
-    bot = Bot(token=TELEGRAM_TOKEN)
+    defaults = DefaultBotProperties(parse_mode='Markdown')
+    bot = Bot(token=TELEGRAM_TOKEN, default=defaults)
     dp = Dispatcher()
     dp.include_routers(router, *get_dialogs())
     setup_dialogs(dp)
