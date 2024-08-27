@@ -46,6 +46,7 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
         'date': datetime.fromisoformat(hometask.get('date')).strftime('%d.%m'),
         'books': books,
         'image_last': image_last,
+        'author_id': hometask.get('author_id')
     }
 
 
