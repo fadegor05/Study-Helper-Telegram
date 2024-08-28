@@ -5,14 +5,13 @@ from aiogram_dialog.widgets.input import TextInput, MessageInput
 from aiogram.enums.content_type import ContentType
 from aiogram_dialog.widgets.media import DynamicMedia
 
-from app.dialogs.hometask import states, keyboards, callbacks, getters
-
+from app.dialogs.hometask import states, keyboards, callbacks, getters, utils
 
 def hometask_window():
     return Window(
         Format('*Домашнее задание* 📑\n\n📋 Невыполненых заданий: {uncompleted_amount}\n\nВыберите интересующее вас задание 📚'),
         keyboards.paginated_hometasks(callbacks.on_chosen_hometask),
-        Button(Const('📝 Создать задание'), 'hometask_create_button', callbacks.on_create_hometask),
+        Button(Const('📝 Создать задание'), 'hometask_create_button', callbacks.on_create_hometask, when=utils.is_editor),
         Cancel(Const('⬅️ Назад')),
         state=states.HometaskMenu.select_hometask,
         getter=getters.get_hometasks,
@@ -24,7 +23,7 @@ def hometask_info_window():
         DynamicMedia('image_last'),
         Format('*{date} - {lesson}* 🗒️\n{is_completed}\n\n{task}\n\n*Материалы* 📚\n{books}\n\n[Автор](tg://user?id={author_id}) 🔗'),
         Button(Format('{is_completed_button}'), 'status_change_hometask_button', callbacks.change_hometask_status),
-        Button(Const('✏️ Редактировать'), 'hometask_edit_button'),
+        Button(Const('✏️ Редактировать'), 'hometask_edit_button', when=utils.is_editor),
         Cancel(Const('⬅️ Назад')),
         state=states.HometaskInfo.info_hometask,
         getter=getters.get_hometask,

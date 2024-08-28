@@ -11,10 +11,12 @@ from aiogram_dialog.api.entities import MediaAttachment, MediaId
 from aiogram.enums.content_type import ContentType
 
 from app.crud.schedule import get_lesson_weekdays_by_uuid
+from app.crud.user import is_user_editor_by_telegram_id
 
 
 async def get_hometasks(dialog_manager: DialogManager, **kwargs):
     user_id = int(dialog_manager.middleware_data.get('event_chat').id)
+    is_editor = await is_user_editor_by_telegram_id(user_id)
     uncompleted_tasks_amount = await get_amount_hometasks_uncompleted(user_id)
     hometasks = []
     for hometask in await get_hometasks_all_sorted(user_id):
@@ -23,7 +25,8 @@ async def get_hometasks(dialog_manager: DialogManager, **kwargs):
         hometasks.append(hometask)
     return {
         'hometasks': hometasks,
-        'uncompleted_amount': uncompleted_tasks_amount
+        'uncompleted_amount': uncompleted_tasks_amount,
+        'is_editor': is_editor
     }
 
 
@@ -31,6 +34,7 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
     hometask_uuid = dialog_manager.start_data.get('hometask_uuid')
     hometask = await get_hometask_by_uuid(hometask_uuid)
     user_id = dialog_manager.middleware_data.get('event_chat').id
+    is_editor = await is_user_editor_by_telegram_id(user_id)
     lesson = await get_lesson_by_uuid(hometask.get('lesson_uuid'))
     books_list = lesson.get('books')
     books = '\n'.join([f'{book} - {books_list.get(book)}' for book in books_list]) if books_list else '...'
@@ -46,7 +50,8 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
         'date': datetime.fromisoformat(hometask.get('date')).strftime('%d.%m'),
         'books': books,
         'image_last': image_last,
-        'author_id': hometask.get('author_id')
+        'author_id': hometask.get('author_id'),
+        'is_editor': is_editor
     }
 
 
