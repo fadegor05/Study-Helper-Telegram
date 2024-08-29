@@ -15,3 +15,8 @@ class HometaskCreate(StatesGroup):
     task_hometask = State()
     image_hometask = State()
     confirm_hometask = State()
+
+
+class HometaskEdit(StatesGroup):
+    task_hometask = State()
+    confirm_hometask = State()

@@ -6,10 +6,11 @@ from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.kbd import Select, Button
 from aiogram_dialog.widgets.input import MessageInput, TextInput
 
-from app.crud.hometask import change_hometask_status_by_uuid_and_user_id, create_hometask, get_hometask_by_uuid
+from app.crud.hometask import change_hometask_status_by_uuid_and_user_id, create_hometask, get_hometask_by_uuid, \
+    update_hometask_task_by_uuid
 from app.crud.schedule import get_lesson_weekdays_by_uuid
 from app.crud.user import is_user_editor_by_telegram_id
-from app.dialogs.hometask.states import HometaskInfo, HometaskCreate
+from app.dialogs.hometask.states import HometaskInfo, HometaskCreate, HometaskEdit
 
 
 async def on_chosen_hometask(c: CallbackQuery, widget: Select, manager: DialogManager, hometask_uuid: str, **kwargs):
@@ -89,4 +90,20 @@ async def on_done_create_hometask(c: CallbackQuery, widget: Button, manager: Dia
     images = manager.dialog_data.get('images')
     await create_hometask(lesson_uuid, task, date, images, user_id)
     await c.answer('Задание было успешно добавлено ✅')
+    await manager.done()
+
+async def on_edit_hometask(c: CallbackQuery, widget: Button, manager: DialogManager):
+    hometask_uuid = manager.start_data.get('hometask_uuid')
+    await manager.start(HometaskEdit.task_hometask, {'hometask_uuid': hometask_uuid})
+
+async def on_entered_edit_task(m: Message, widget: TextInput, manager: DialogManager, task: str, **kwargs):
+    manager.dialog_data.update(task=task)
+    await manager.switch_to(HometaskEdit.confirm_hometask)
+
+
+async def on_done_edit_hometask(c: CallbackQuery, widget: Button, manager: DialogManager):
+    hometask_uuid = manager.start_data.get('hometask_uuid')
+    task = manager.dialog_data.get('task')
+    await update_hometask_task_by_uuid(hometask_uuid, task)
+    await c.answer('Задание было успешно обновлено ✅')
     await manager.done()

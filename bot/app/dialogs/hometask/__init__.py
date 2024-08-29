@@ -16,5 +16,9 @@ def menu_dialogs():
             windows.hometask_date_window(),
             windows.hometask_task_window(),
             windows.hometask_images_window(),
+        ),
+        Dialog(
+            windows.hometask_edit_task_window(),
+            windows.hometask_edit_done_window(),
         )
     ]

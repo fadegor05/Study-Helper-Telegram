@@ -80,3 +80,16 @@ async def get_dates(dialog_manager: DialogManager, **kwargs):
     return {
         'dates': dates
     }
+
+async def get_hometask_task(dialog_manager: DialogManager, **kwargs):
+    hometask_uuid = dialog_manager.start_data.get('hometask_uuid')
+    hometask = await get_hometask_by_uuid(hometask_uuid)
+    return {
+        'task': hometask.get('task')
+    }
+
+async def get_hometask_edited(dialog_manager: DialogManager, **kwargs):
+    task = dialog_manager.dialog_data.get('task')
+    return {
+        'task': task
+    }
