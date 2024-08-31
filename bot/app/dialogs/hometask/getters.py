@@ -69,16 +69,19 @@ async def get_dates(dialog_manager: DialogManager, **kwargs):
     now = datetime.now()
     start_datetime = datetime(now.year, now.month, now.day, 10, 0, 0)
     end_datetime = start_datetime + timedelta(days=10)
-
+    in_schedule = True
+    if len(lesson_weekdays) == 0:
+        in_schedule = False
     current_datetime = start_datetime
     while current_datetime <= end_datetime:
-        if current_datetime.isoweekday() in lesson_weekdays:
+        if current_datetime.isoweekday() in lesson_weekdays or not in_schedule:
             dates.append({'date': current_datetime, 'date_iso': current_datetime.isoformat(),
                           'date_str': current_datetime.strftime('%d.%m')})
         current_datetime += timedelta(days=1)
 
     return {
-        'dates': dates
+        'dates': dates,
+        'in_schedule': in_schedule,
     }
 
 async def get_hometask_task(dialog_manager: DialogManager, **kwargs):

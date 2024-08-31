@@ -6,6 +6,8 @@ from aiogram.enums.content_type import ContentType
 from aiogram_dialog.widgets.media import DynamicMedia
 
 from app.dialogs.hometask import states, keyboards, callbacks, getters, utils
+from app.dialogs.hometask.utils import is_lesson_in_schedule, is_lesson_not_in_schedule
+
 
 def hometask_window():
     return Window(
@@ -32,7 +34,7 @@ def hometask_info_window():
 
 def hometask_lesson_window():
     return Window(
-        Const('Выберите предмет, по которому вы хотите добавить домашнее задание ✏️'),
+        Const('*Выберите предмет, по которому вы хотите добавить домашнее задание* ✏️'),
         keyboards.paginated_lessons(callbacks.on_chosen_lesson),
         Cancel(Const('⬅️ Назад')),
         state=states.HometaskCreate.lesson_hometask,
@@ -42,8 +44,9 @@ def hometask_lesson_window():
 
 def hometask_date_window():
     return Window(
-        Const('Выберите на какой день вы хотите добавить домашнее задание 🗓️'),
-        Button(Const('⏳ Следующий урок'), 'hometask_date_soon', callbacks.on_chosen_soon_date),
+        Const('*Выберите на какой день вы хотите добавить домашнее задание* 🗓️'),
+        Const('\n_Урока еще нет в расписании, учитывай это при выборе даты_ ⚠️', when=is_lesson_not_in_schedule),
+        Button(Const('⏳ Следующий урок'), 'hometask_date_soon', callbacks.on_chosen_soon_date, when=is_lesson_in_schedule),
         keyboards.paginated_dates(callbacks.on_chosen_date),
         Back(Const('⬅️ Назад')),
         state=states.HometaskCreate.date_hometask,
@@ -53,7 +56,7 @@ def hometask_date_window():
 
 def hometask_task_window():
     return Window(
-        Const('Введите домашнее задание 📝'),
+        Const('*Введите домашнее задание* 📝'),
         TextInput('hometask_task_input', on_success=callbacks.on_entered_task),
         Back(Const('⬅️ Назад')),
         state=states.HometaskCreate.task_hometask
@@ -62,7 +65,7 @@ def hometask_task_window():
 
 def hometask_images_window():
     return Window(
-        Const('Прикрепите фото задания 📷\n\nЕсли же вы прикрепили нужные фото, то нажмите готово ✅'),
+        Const('*Прикрепите фото задания* 📷\n\nЕсли же вы прикрепили нужные фото, то нажмите готово ✅'),
         MessageInput(callbacks.on_sent_images, ContentType.PHOTO),
         Back(Const('⬅️ Назад')),
         Button(Const('✅ Готово'), 'hometask_done_create_hometask', callbacks.on_done_create_hometask),
@@ -71,7 +74,7 @@ def hometask_images_window():
 
 def hometask_edit_task_window():
     return Window(
-        Format('Текущее домашнее задание 📚\n\n{task}\n\nВведите новое домашнее задание 📝'),
+        Format('*Текущее домашнее задание* 📚\n\n{task}\n\nВведите новое домашнее задание 📝'),
         TextInput('hometask_task_input', on_success=callbacks.on_entered_edit_task),
         Cancel(Const('⬅️ Назад')),
         state=states.HometaskEdit.task_hometask,
