@@ -2,6 +2,7 @@ version: '3.9'
 
 services:
   mongo:
+    restart: always
     image: mongo:latest
     container_name: study-helper-mongodb
     environment:
@@ -15,6 +16,7 @@ services:
       - mongodata:/data/db
 
   bot:
+    restart: always
     container_name: study-helper-bot
     env_file:
       - .env
