@@ -12,7 +12,7 @@ async def start_handler(message: Message, dialog_manager: DialogManager):
     if not await user_exits_by_telegram_id(int(message.from_user.id)):
         await create_user(int(message.from_user.id), message.from_user.username)
     if not await have_user_access_by_telegram_id(int(message.from_user.id)):
-        await message.answer('*Упс...* К сожалению, у вас нет доступа к этом боту ⛔️️')
+        await message.answer('*Упс...* Пока что️ у вас нет доступа к этом боту ⏳')
         return
     await dialog_manager.start(StartMenu.select_menu, mode=StartMode.RESET_STACK)
 
