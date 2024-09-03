@@ -1,6 +1,6 @@
 from typing import List
 from uuid import uuid4
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from app.crud.lesson import get_lesson_by_uuid
 from app.database import mongo_connection, mongo_get_collection
@@ -15,8 +15,13 @@ async def get_amount_hometasks_uncompleted(telegram_id: int):
 async def get_hometasks_all_sorted(telegram_id: int):
     connection = await mongo_connection()
     hometask_collection = await mongo_get_collection(connection, 'hometasks')
+    tomorrow = (datetime.today() + timedelta(days=1)).date()
+    if tomorrow == 7:
+        tomorrow += timedelta(days=1)
     uncompleted = list(hometask_collection.find({'completed_by': {'$nin': [telegram_id]}}).sort({'date': -1}))
+    uncompleted.sort(key=lambda x: datetime.fromisoformat(x['date']).date() != tomorrow)
     completed = list(hometask_collection.find({'completed_by': {'$in': [telegram_id]}}).sort({'date': -1}))
+    completed.sort(key=lambda x: datetime.fromisoformat(x['date']).date() != tomorrow)
     for hometask in completed:
         uncompleted.append(hometask)
     return uncompleted
