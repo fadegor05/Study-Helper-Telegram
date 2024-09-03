@@ -56,3 +56,15 @@ async def sync_schedule_with_lessons_crud():
             {'day': schedule['day']},
             {'$set': {'lessons': updated_lessons}}
         )
+
+
+async def delete_schedule():
+    connection = await mongo_connection()
+    schedule_collection = await mongo_get_collection(connection, 'schedule')
+    schedule_collection.delete_many({})
+
+
+async def insert_schedule(schedule: list):
+    connection = await mongo_connection()
+    schedule_collection = await mongo_get_collection(connection, 'schedule')
+    schedule_collection.insert_many(schedule)

@@ -13,6 +13,7 @@ def settings_window():
         Button(Format('{schedule_notification} Уведомление о расписании'), 'schedule_notification_button', callbacks.on_chosen_schedule_notification),
         Button(Const('🔄 Синхронизация расписания с предметами'), 'lessons_sync_button', callbacks.sync_schedule_with_lessons, when=is_admin),
         Button(Const('🔄 Синхронизация Д/З с предметами'), 'hometasks_sync_button', callbacks.sync_hometasks_with_lessons, when=is_admin),
+        Button(Const('⬇️ Парсинг расписания с mstimetables'), 'schedule_parse_button', callbacks.parse_schedule, when=is_admin),
         Cancel(Const('⬅️ Назад')),
         getter=getters.get_settings,
         state=states.SettingsMenu.settings,
