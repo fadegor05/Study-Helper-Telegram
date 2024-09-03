@@ -12,6 +12,20 @@ async def get_amount_hometasks_uncompleted(telegram_id: int):
     return hometask_collection.count_documents({'completed_by': {'$nin': [telegram_id]}})
 
 
+async def get_tomorrow_amount_hometasks_uncompleted(telegram_id: int):
+    connection = await mongo_connection()
+    hometask_collection = await mongo_get_collection(connection, 'hometasks')
+    uncompleted_hometasks = hometask_collection.find({'completed_by': {'$nin': [telegram_id]}})
+    tomorrow = (datetime.today() + timedelta(days=1)).date()
+    if tomorrow == 7:
+        tomorrow += timedelta(days=1)
+    tomorrow_uncompleted_hometaks = 0
+    for hometask in uncompleted_hometasks:
+        if datetime.fromisoformat(hometask.get('date')).date() == tomorrow:
+            tomorrow_uncompleted_hometaks += 1
+    return tomorrow_uncompleted_hometaks
+
+
 async def get_hometasks_all_sorted(telegram_id: int):
     connection = await mongo_connection()
     hometask_collection = await mongo_get_collection(connection, 'hometasks')

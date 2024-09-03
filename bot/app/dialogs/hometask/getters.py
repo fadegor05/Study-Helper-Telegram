@@ -5,7 +5,8 @@ from typing import Dict
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.common import Whenable
 
-from app.crud.hometask import get_hometask_by_uuid, get_hometasks_all_sorted, get_amount_hometasks_uncompleted
+from app.crud.hometask import get_hometask_by_uuid, get_hometasks_all_sorted, get_amount_hometasks_uncompleted, \
+    get_tomorrow_amount_hometasks_uncompleted
 from app.crud.lesson import get_lesson_by_uuid, get_lessons_all
 from aiogram_dialog.api.entities import MediaAttachment, MediaId
 from aiogram.enums.content_type import ContentType
@@ -18,6 +19,7 @@ async def get_hometasks(dialog_manager: DialogManager, **kwargs):
     user_id = int(dialog_manager.middleware_data.get('event_chat').id)
     is_editor = await is_user_editor_by_telegram_id(user_id)
     uncompleted_tasks_amount = await get_amount_hometasks_uncompleted(user_id)
+    tomorrow_uncompleted_tasks_amount = await get_tomorrow_amount_hometasks_uncompleted(user_id)
     hometasks = []
     for hometask in await get_hometasks_all_sorted(user_id):
         hometask.update(date=datetime.fromisoformat(hometask.get('date')).strftime('%d.%m'),
@@ -25,7 +27,9 @@ async def get_hometasks(dialog_manager: DialogManager, **kwargs):
         hometasks.append(hometask)
     return {
         'hometasks': hometasks,
-        'uncompleted_amount': uncompleted_tasks_amount,
+        'title_uncompleted_str': '📋 *Невыполненные задания*\n' if uncompleted_tasks_amount else '*Вы выполнили все задания* 🎉\n',
+        'tomorrow_uncompleted_amount_str': f'На завтра: {tomorrow_uncompleted_tasks_amount}\n' if tomorrow_uncompleted_tasks_amount > 0 else '',
+        'uncompleted_amount_str': f'Всего: {uncompleted_tasks_amount}\n' if uncompleted_tasks_amount > 0 else '',
         'is_editor': is_editor
     }
 

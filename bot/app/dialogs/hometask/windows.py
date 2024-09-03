@@ -11,7 +11,7 @@ from app.dialogs.hometask.utils import is_lesson_in_schedule, is_lesson_not_in_s
 
 def hometask_window():
     return Window(
-        Format('*Домашнее задание* 📑\n\n📋 Невыполненых заданий: {uncompleted_amount}\n\nВыберите интересующее вас задание 📚'),
+        Format('*Домашнее задание* 📑\n\n{title_uncompleted_str}{tomorrow_uncompleted_amount_str}{uncompleted_amount_str}\nВыберите интересующее вас задание 📚'),
         keyboards.paginated_hometasks(callbacks.on_chosen_hometask),
         Button(Const('📝 Создать задание'), 'hometask_create_button', callbacks.on_create_hometask, when=utils.is_editor),
         Cancel(Const('⬅️ Назад')),
