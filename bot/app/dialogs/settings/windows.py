@@ -14,6 +14,7 @@ def settings_window():
         Button(Const('🔄 Синхронизация расписания с предметами'), 'lessons_sync_button', callbacks.sync_schedule_with_lessons, when=is_admin),
         Button(Const('🔄 Синхронизация Д/З с предметами'), 'hometasks_sync_button', callbacks.sync_hometasks_with_lessons, when=is_admin),
         Button(Const('⬇️ Парсинг расписания с mstimetables'), 'schedule_parse_button', callbacks.parse_schedule, when=is_admin),
+        Button(Const('⬇️ Парсинг предметов с mstimetables'), 'lessons_parse_button', callbacks.parse_lessons, when=is_admin),
         Cancel(Const('⬅️ Назад')),
         getter=getters.get_settings,
         state=states.SettingsMenu.settings,
