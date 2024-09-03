@@ -27,7 +27,7 @@ async def get_hometasks(dialog_manager: DialogManager, **kwargs):
         hometasks.append(hometask)
     return {
         'hometasks': hometasks,
-        'title_uncompleted_str': '📋 *Невыполненные задания*\n' if uncompleted_tasks_amount else '*Вы выполнили все задания* 🎉\n',
+        'title_uncompleted_str': '📋 *Невыполненных заданий*\n' if uncompleted_tasks_amount else '*Вы выполнили все задания* 🎉\n',
         'tomorrow_uncompleted_amount_str': f'На завтра: {tomorrow_uncompleted_tasks_amount}\n' if tomorrow_uncompleted_tasks_amount > 0 else '',
         'uncompleted_amount_str': f'Всего: {uncompleted_tasks_amount}\n' if uncompleted_tasks_amount > 0 else '',
         'is_editor': is_editor
