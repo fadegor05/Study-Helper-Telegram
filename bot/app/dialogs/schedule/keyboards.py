@@ -21,7 +21,7 @@ def paginated_schedule(on_click):
 def paginated_lessons():
     return ScrollingGroup(
         Select(
-            Format('{item[start_time]} {item[name]} ({item[classroom]}, {item[building]} корпус)'),
+            Format('{item[start_time]} {item[name]} {item[place]}'),
             id='s_scroll_lessons',
             item_id_getter=operator.itemgetter('lesson_uuid'),
             items='lessons',

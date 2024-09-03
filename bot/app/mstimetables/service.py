@@ -48,7 +48,7 @@ async def get_schedule_from_mstimetables() -> list[dict[str, str | int | list[An
                     'name': DAYS[int(lesson['weekday'])],
                     'lessons': []
                 }
-            classroom, building = '-', '-'
+            classroom, building = None, None
             if lesson['cabinet']:
                 classroom, building = await parse_classroom(lesson['cabinet']['name'])
             week[lesson['weekday']]['lessons'].append({
