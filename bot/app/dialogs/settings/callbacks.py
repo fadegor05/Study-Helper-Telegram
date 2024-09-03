@@ -2,6 +2,7 @@ from aiogram.types import CallbackQuery
 from aiogram_dialog import DialogManager
 from aiogram_dialog.widgets.kbd import Button
 
+from app.crud.hometask import sync_hometasks_with_lessons_crud
 from app.crud.schedule import sync_schedule_with_lessons_crud
 from app.crud.user import get_user_by_telegram_id, set_hometask_notification_by_telegram_id, \
     set_schedule_notification_by_telegram_id
@@ -21,3 +22,7 @@ async def on_chosen_hometask_notification(c: CallbackQuery, widget: Button, mana
 
 async def sync_schedule_with_lessons(c: CallbackQuery, widget: Button, manager: DialogManager):
     await sync_schedule_with_lessons_crud()
+
+
+async def sync_hometasks_with_lessons(c: CallbackQuery, widget: Button, manager: DialogManager):
+    await sync_hometasks_with_lessons_crud()

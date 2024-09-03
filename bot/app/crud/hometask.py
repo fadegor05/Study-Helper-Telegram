@@ -82,3 +82,18 @@ async def change_hometask_status_by_uuid_and_user_id(hometask_uuid: str, user_id
         hometask_collection.update_one({'uuid': hometask_uuid}, {'$pull': {'completed_by': user_id}})
     else:
         hometask_collection.update_one({'uuid': hometask_uuid}, {'$push': {'completed_by': user_id}})
+
+
+async def sync_hometasks_with_lessons_crud():
+    connection = await mongo_connection()
+    hometask_collection = await mongo_get_collection(connection, 'hometasks')
+    lesson_collection = await mongo_get_collection(connection, 'lessons')
+    for hometask in hometask_collection.find({}):
+        lesson_uuid = hometask["lesson_uuid"]
+        matching_lesson = lesson_collection.find_one({"uuid": lesson_uuid})
+        if matching_lesson:
+            new_lesson_name = matching_lesson["name"]
+            hometask_collection.update_one(
+                {"uuid": hometask["uuid"]},
+                {"$set": {"lesson": new_lesson_name}}
+            )
