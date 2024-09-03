@@ -1,6 +1,6 @@
 from typing import List
 from uuid import uuid4
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from app.crud.lesson import get_lesson_by_uuid
 from app.database import mongo_connection, mongo_get_collection
@@ -12,11 +12,30 @@ async def get_amount_hometasks_uncompleted(telegram_id: int):
     return hometask_collection.count_documents({'completed_by': {'$nin': [telegram_id]}})
 
 
+async def get_tomorrow_amount_hometasks_uncompleted(telegram_id: int):
+    connection = await mongo_connection()
+    hometask_collection = await mongo_get_collection(connection, 'hometasks')
+    uncompleted_hometasks = hometask_collection.find({'completed_by': {'$nin': [telegram_id]}})
+    tomorrow = (datetime.today() + timedelta(days=1)).date()
+    if tomorrow == 7:
+        tomorrow += timedelta(days=1)
+    tomorrow_uncompleted_hometaks = 0
+    for hometask in uncompleted_hometasks:
+        if datetime.fromisoformat(hometask.get('date')).date() == tomorrow:
+            tomorrow_uncompleted_hometaks += 1
+    return tomorrow_uncompleted_hometaks
+
+
 async def get_hometasks_all_sorted(telegram_id: int):
     connection = await mongo_connection()
     hometask_collection = await mongo_get_collection(connection, 'hometasks')
+    tomorrow = (datetime.today() + timedelta(days=1)).date()
+    if tomorrow == 7:
+        tomorrow += timedelta(days=1)
     uncompleted = list(hometask_collection.find({'completed_by': {'$nin': [telegram_id]}}).sort({'date': -1}))
+    uncompleted.sort(key=lambda x: datetime.fromisoformat(x['date']).date() != tomorrow)
     completed = list(hometask_collection.find({'completed_by': {'$in': [telegram_id]}}).sort({'date': -1}))
+    completed.sort(key=lambda x: datetime.fromisoformat(x['date']).date() != tomorrow)
     for hometask in completed:
         uncompleted.append(hometask)
     return uncompleted
@@ -63,3 +82,18 @@ async def change_hometask_status_by_uuid_and_user_id(hometask_uuid: str, user_id
         hometask_collection.update_one({'uuid': hometask_uuid}, {'$pull': {'completed_by': user_id}})
     else:
         hometask_collection.update_one({'uuid': hometask_uuid}, {'$push': {'completed_by': user_id}})
+
+
+async def sync_hometasks_with_lessons_crud():
+    connection = await mongo_connection()
+    hometask_collection = await mongo_get_collection(connection, 'hometasks')
+    lesson_collection = await mongo_get_collection(connection, 'lessons')
+    for hometask in hometask_collection.find({}):
+        lesson_uuid = hometask["lesson_uuid"]
+        matching_lesson = lesson_collection.find_one({"uuid": lesson_uuid})
+        if matching_lesson:
+            new_lesson_name = matching_lesson["name"]
+            hometask_collection.update_one(
+                {"uuid": hometask["uuid"]},
+                {"$set": {"lesson": new_lesson_name}}
+            )
