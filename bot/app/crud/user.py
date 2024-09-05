@@ -55,3 +55,9 @@ async def set_schedule_notification_by_telegram_id(telegram_id: int, state: bool
     connection = await mongo_connection()
     user_collection = await mongo_get_collection(connection, 'users')
     user_collection.update_one({'telegram_id': telegram_id}, {'$set': {'schedule_notification': state}})
+
+
+async def update_username_by_telegram_id(telegram_id: int, username: str):
+    connection = await mongo_connection()
+    user_collection = await mongo_get_collection(connection, 'users')
+    user_collection.update_one({'telegram_id': telegram_id}, {'$set': {'username': username}})
