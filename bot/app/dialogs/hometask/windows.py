@@ -25,7 +25,7 @@ def hometask_info_window():
         DynamicMedia('image_last'),
         Format('*{date} {lesson}*\n{is_completed}\n\n{task}\n\n*Материалы* 📚\n{books}\n\n[Автор](tg://user?id={author_id}) 🔗'),
         Button(Format('{is_completed_button}'), 'status_change_hometask_button', callbacks.change_hometask_status),
-        Button(Const('✏️ Редактировать'), 'hometask_edit_button', callbacks.on_edit_hometask, when=utils.is_editor),
+        Button(Const('✏️ Изменить задание'), 'hometask_edit_button', callbacks.on_edit_hometask, when=utils.is_editor),
         Cancel(Const('⬅️ Назад')),
         state=states.HometaskInfo.info_hometask,
         getter=getters.get_hometask,
@@ -83,7 +83,7 @@ def hometask_edit_task_window():
 
 def hometask_edit_done_window():
     return Window(
-        Format('Измененное домашнее задание ✏️\n\n`{task}`'),
+        Format('Измененное задание ✏️\n\n`{task}`'),
         Back(Const('⬅️ Назад')),
         Button(Const('✅ Готово'), 'hometask_done_edit_hometask', callbacks.on_done_edit_hometask),
         state=states.HometaskEdit.confirm_hometask,
