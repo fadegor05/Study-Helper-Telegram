@@ -20,5 +20,11 @@ def menu_dialogs():
         Dialog(
             windows.hometask_edit_task_window(),
             windows.hometask_edit_done_window(),
+        ),
+        Dialog(
+            windows.hometask_edit_date_window(),
+        ),
+        Dialog(
+            windows.hometask_delete_window(),
         )
     ]

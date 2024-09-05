@@ -20,3 +20,9 @@ class HometaskCreate(StatesGroup):
 class HometaskEdit(StatesGroup):
     task_hometask = State()
     confirm_hometask = State()
+
+class HometaskDateEdit(StatesGroup):
+    date_hometask = State()
+
+class HometaskDelete(StatesGroup):
+    confirm_hometask = State()
