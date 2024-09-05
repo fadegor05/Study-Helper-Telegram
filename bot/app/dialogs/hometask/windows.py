@@ -27,6 +27,7 @@ def hometask_info_window():
         Button(Format('{is_completed_button}'), 'status_change_hometask_button', callbacks.change_hometask_status),
         Button(Const('✏️ Изменить задание'), 'hometask_edit_button', callbacks.on_edit_hometask, when=utils.is_editor),
         Button(Const('🗓️ Изменить дату'), 'date_edit_button', callbacks.on_edit_date, when=utils.is_editor),
+        Button(Const('🗑️ Удалить'), 'date_delete_button', callbacks.on_delete_hometask, when=utils.is_editor),
         Cancel(Const('⬅️ Назад')),
         state=states.HometaskInfo.info_hometask,
         getter=getters.get_hometask,
@@ -100,4 +101,12 @@ def hometask_edit_done_window():
         Button(Const('✅ Готово'), 'hometask_done_edit_hometask', callbacks.on_done_edit_hometask),
         state=states.HometaskEdit.confirm_hometask,
         getter=getters.get_hometask_edited
+    )
+
+def hometask_delete_window():
+    return Window(
+        Format('Если вы действительно хотите удалить данное задание, то нажмите *Удалить* 🗑️\n\n_После удаления нажмите назад, чтобы вернуться к списку Д/З_ ⚠️'),
+        Cancel(Const('⬅️ Назад')),
+        Button(Const('🗑️ Удалить'), 'hometask_delete_hometask', callbacks.on_delete_confirm_hometask),
+        state=states.HometaskDelete.confirm_hometask,
     )

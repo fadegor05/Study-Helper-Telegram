@@ -23,3 +23,6 @@ class HometaskEdit(StatesGroup):
 
 class HometaskDateEdit(StatesGroup):
     date_hometask = State()
+
+class HometaskDelete(StatesGroup):
+    confirm_hometask = State()
