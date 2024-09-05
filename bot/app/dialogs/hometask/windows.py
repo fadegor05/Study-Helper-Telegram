@@ -74,7 +74,7 @@ def hometask_images_window():
 
 def hometask_edit_task_window():
     return Window(
-        Format('*Текущее домашнее задание* 📚\n\n{task}\n\nВведите новое домашнее задание 📝'),
+        Format('*Текущее домашнее задание* 📚\n\n`{task}`\n\nВведите новое домашнее задание 📝'),
         TextInput('hometask_task_input', on_success=callbacks.on_entered_edit_task),
         Cancel(Const('⬅️ Назад')),
         state=states.HometaskEdit.task_hometask,
@@ -83,7 +83,7 @@ def hometask_edit_task_window():
 
 def hometask_edit_done_window():
     return Window(
-        Format('Измененное домашнее задание ✏️\n\n{task}'),
+        Format('Измененное домашнее задание ✏️\n\n`{task}`'),
         Back(Const('⬅️ Назад')),
         Button(Const('✅ Готово'), 'hometask_done_edit_hometask', callbacks.on_done_edit_hometask),
         state=states.HometaskEdit.confirm_hometask,
