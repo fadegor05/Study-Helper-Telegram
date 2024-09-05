@@ -67,7 +67,15 @@ async def get_lessons(dialog_manager: DialogManager, **kwargs):
 
 
 async def get_dates(dialog_manager: DialogManager, **kwargs):
-    lesson_uuid = dialog_manager.dialog_data.get('lesson_uuid')
+    hometask_uuid = None
+    if dialog_manager.start_data:
+        hometask_uuid = dialog_manager.start_data.get('hometask_uuid')
+    lesson_uuid = None
+    if hometask_uuid:
+        hometask = await get_hometask_by_uuid(hometask_uuid)
+        lesson_uuid = hometask.get('lesson_uuid')
+    else:
+        lesson_uuid = dialog_manager.dialog_data.get('lesson_uuid')
     lesson_weekdays = await get_lesson_weekdays_by_uuid(lesson_uuid)
     dates = []
     now = datetime.now()
