@@ -23,7 +23,7 @@ def hometask_window():
 def hometask_info_window():
     return Window(
         DynamicMedia('image_last'),
-        Format('*{date} {lesson}*\n{is_completed}\n\n{task}\n\n*Материалы* 📚\n{books}\n\n[Автор](tg://user?id={author_id}) 🔗'),
+        Format('*{date} {lesson}*\n{is_completed}\n\n{task}\n\n*Материалы* 📚\n{books}\n\n*Автор* 🔗\n@{author_username}'),
         Button(Format('{is_completed_button}'), 'status_change_hometask_button', callbacks.change_hometask_status),
         Button(Const('✏️ Изменить задание'), 'hometask_edit_button', callbacks.on_edit_hometask, when=utils.is_editor),
         Button(Const('🗓️ Изменить дату'), 'date_edit_button', callbacks.on_edit_date, when=utils.is_editor),
