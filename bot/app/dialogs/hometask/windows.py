@@ -26,6 +26,7 @@ def hometask_info_window():
         Format('*{date} {lesson}*\n{is_completed}\n\n{task}\n\n*Материалы* 📚\n{books}\n\n[Автор](tg://user?id={author_id}) 🔗'),
         Button(Format('{is_completed_button}'), 'status_change_hometask_button', callbacks.change_hometask_status),
         Button(Const('✏️ Изменить задание'), 'hometask_edit_button', callbacks.on_edit_hometask, when=utils.is_editor),
+        Button(Const('🗓️ Изменить дату'), 'date_edit_button', callbacks.on_edit_date, when=utils.is_editor),
         Cancel(Const('⬅️ Назад')),
         state=states.HometaskInfo.info_hometask,
         getter=getters.get_hometask,
@@ -70,6 +71,17 @@ def hometask_images_window():
         Back(Const('⬅️ Назад')),
         Button(Const('✅ Готово'), 'hometask_done_create_hometask', callbacks.on_done_create_hometask),
         state=states.HometaskCreate.image_hometask
+    )
+
+def hometask_edit_date_window():
+    return Window(
+        Const('*Выберите на какой день вы хотите изменить домашнее задание* 🗓️'),
+        Const('\n_Урока еще нет в расписании, учитывай это при выборе даты_ ⚠️', when=is_lesson_not_in_schedule),
+        Button(Const('⏳ Следующий урок'), 'hometask_edit_date_soon', callbacks.on_chosen_soon_edit_date, when=is_lesson_in_schedule),
+        keyboards.paginated_dates(callbacks.on_chosen_edit_date),
+        Cancel(Const('⬅️ Назад')),
+        state=states.HometaskDateEdit.date_hometask,
+        getter=getters.get_dates,
     )
 
 def hometask_edit_task_window():
