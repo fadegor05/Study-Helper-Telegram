@@ -45,6 +45,11 @@ async def update_hometask_task_by_uuid(hometask_uuid: str, task: str):
     hometask_collection = await mongo_get_collection(connection, 'hometasks')
     hometask_collection.update_one({'uuid': hometask_uuid}, {'$set': {'task': task}})
 
+async def update_hometask_date_by_uuid(hometask_uuid: str, date: str):
+    connection = await mongo_connection()
+    hometask_collection = await mongo_get_collection(connection, 'hometasks')
+    hometask_collection.update_one({'uuid': hometask_uuid}, {'$set': {'date': date}})
+
 async def get_hometasks_all():
     connection = await mongo_connection()
     hometask_collection = await mongo_get_collection(connection, 'hometasks')
