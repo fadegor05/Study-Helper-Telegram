@@ -15,9 +15,9 @@ jobs:
 
     - name: Debugging Environment Variables
       run: |
-        echo "USER: ${{ secrets.SERVER_USER }}"
-        echo "IP: ${{ secrets.SERVER_IP }}"
-        echo "DIR: ${{ secrets.SERVER_DIRECTORY }}"
+        echo "USER: ${{ secrets.SSH_USER }}"
+        echo "IP: ${{ secrets.SSH_HOST }}"
+        echo "DIR: ${{ secrets.WORK_DIR }}"
     
     - name: Set up SSH
       uses: webfactory/ssh-agent@v0.5.4
