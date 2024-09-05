@@ -4,23 +4,28 @@ import sys
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
+from aiogram.fsm.storage.redis import RedisStorage
 from apscheduler.triggers.cron import CronTrigger
+from redis.asyncio import Redis
 
 from app.apsched.hometask import hometask_notification
 from app.database import mongo_connection, mongo_init
 from aiogram_dialog import setup_dialogs
 from app.dialogs import get_dialogs
 from app.handlers.router import router
-from app.core.config import TELEGRAM_TOKEN, MONGO_DATABASE_NAME
+from app.core.config import TELEGRAM_TOKEN, REDIS_URL
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 
 async def main() -> None:
     connection = await mongo_connection()
     await mongo_init(connection)
+    storage = RedisStorage.from_url(REDIS_URL)
+    storage.key_builder.with_destiny = True
+
     defaults = DefaultBotProperties(parse_mode='Markdown')
     bot = Bot(token=TELEGRAM_TOKEN, default=defaults)
-    dp = Dispatcher()
+    dp = Dispatcher(storage=storage)
     dp.include_routers(router, *get_dialogs())
     setup_dialogs(dp)
 

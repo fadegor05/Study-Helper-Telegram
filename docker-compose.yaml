@@ -11,9 +11,18 @@ services:
     env_file:
       - .env
     ports:
-      - 27017:27017
+      - ${MONGO_PORT}:${MONGO_PORT}
     volumes:
       - mongodata:/data/db
+
+  redis:
+    image: redis:alpine
+    container_name: study-helper-redis
+    restart: always
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    volumes:
+      - redisdata:/data
 
   bot:
     restart: always
@@ -22,7 +31,9 @@ services:
       - .env
     depends_on:
       - mongo
+      - redis
     build: ./bot
 
 volumes:
   mongodata:
+  redisdata:
