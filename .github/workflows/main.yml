@@ -13,6 +13,12 @@ jobs:
     - name: Checkout the code
       uses: actions/checkout@v2
 
+    - name: Debugging Environment Variables
+      run: |
+        echo "USER: ${{ secrets.SERVER_USER }}"
+        echo "IP: ${{ secrets.SERVER_IP }}"
+        echo "DIR: ${{ secrets.SERVER_DIRECTORY }}"
+    
     - name: Set up SSH
       uses: webfactory/ssh-agent@v0.5.4
       with:
@@ -24,6 +30,7 @@ jobs:
         IP: ${{ secrets.SSH_HOST }}
         DIR: ${{ secrets.WORK_DIR }}
       run: |
+        echo "Connecting to server $USER@$IP and creating directory $DIR"
         ssh -o StrictHostKeyChecking=no $USER@$IP 'mkdir -p $DIR'
         rsync -avz --exclude '.git' . $USER@$IP:$DIR
 
@@ -34,3 +41,4 @@ jobs:
         DIR: ${{ secrets.WORK_DIR }}
       run: |
         ssh -o StrictHostKeyChecking=no $USER@$IP 'cd $DIR && docker compose up -d --build'
+
