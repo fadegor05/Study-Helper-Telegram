@@ -1,7 +1,10 @@
-name: Deploy to Server
+name: Deploy on push to main
 
 on:
   push:
+    branches:
+      - main
+  pull_request:
     branches:
       - main
 
@@ -10,27 +13,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout the code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Debugging Environment Variables
-      run: |
-        echo "USER: ${{ secrets.SSH_USER }}"
-        echo "IP: ${{ secrets.SSH_HOST }}"
-        echo "DIR: ${{ secrets.WORK_DIR }}"
-    
-    - name: Set up SSH
-      uses: webfactory/ssh-agent@v0.5.4
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Copy files to server
-      run: |
-        echo "Connecting to server $USER@$IP and creating directory $DIR"
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'mkdir -p ${{ secrets.WORK_DIR }}'
-        rsync -avz --exclude '.git' . ${{ secrets.SSH_USER }}@{{ secrets.SSH_HOST }}:${{ secrets.WORK_DIR }}
-
-    - name: Run docker-compose on server
-      run: |
-        ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'cd ${{ secrets.WORK_DIR }} && docker compose up -d --build'
-
+      - name: Deploy using SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            cd ~/Study-Helper-Telegram
+            git fetch
+            git checkout ${{ secrets.MAIN_BRANCH }}
+            git pull
+            
+            docker-compose down
+            docker-compose up -d --build
