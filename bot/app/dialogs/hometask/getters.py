@@ -39,6 +39,7 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
     hometask = await get_hometask_by_uuid(hometask_uuid)
     user_id = dialog_manager.middleware_data.get('event_chat').id
     user = await get_user_by_telegram_id(user_id)
+    author = await get_user_by_telegram_id(hometask.get('author_id'))
     is_editor = await is_user_editor_by_telegram_id(user_id)
     lesson = await get_lesson_by_uuid(hometask.get('lesson_uuid'))
     books_list = lesson.get('books')
@@ -55,7 +56,7 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
         'date': datetime.fromisoformat(hometask.get('date')).strftime('%d.%m'),
         'books': books,
         'image_last': image_last,
-        'author_username': user.get('username'),
+        'author_username': author.get('username'),
         'is_editor': is_editor
     }
 
