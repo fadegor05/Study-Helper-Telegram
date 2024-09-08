@@ -7,12 +7,18 @@ from app.dialogs.start import states, callbacks
 
 def start_window():
     return Window(
-        Const('*Добро Пожаловать в study helper™ *👋\n\nЭто - Менеджер домашнего задания, здесь можно найти актуальное '
-              'Д/З, полезные материалы, конспекты, а также учебники 📚\n\nСкрафтил @fadegor05 ⭐\nРедактирует @TGRTX'
-              '📝\n\nВыберите то, что вас интересует 🤔'),
-        Button(Const('📑 Домашнее задание'), 'homework_button', callbacks.on_chosen_hometask),
-        Button(Const('📆 Расписание'), 'schedule_button', callbacks.on_chosen_schedule),
-        Button(Const('⚙️ Настройки'), 'settings_button', callbacks.on_chosen_settings),
-        Cancel(Const('❌ Выход')),
+        Const(
+            "*Добро Пожаловать в study helper™ *👋\n\nЭто - Менеджер домашнего задания, здесь можно найти актуальное "
+            "Д/З, полезные материалы, конспекты, а также учебники 📚\n\nСкрафтил @fadegor05 ⭐\nРедактирует @TGRTX"
+            "📝\n\nВыберите то, что вас интересует 🤔"
+        ),
+        Button(
+            Const("📑 Домашнее задание"),
+            "homework_button",
+            callbacks.on_chosen_hometask,
+        ),
+        Button(Const("📆 Расписание"), "schedule_button", callbacks.on_chosen_schedule),
+        Button(Const("⚙️ Настройки"), "settings_button", callbacks.on_chosen_settings),
+        Cancel(Const("❌ Выход")),
         state=states.StartMenu.select_menu,
     )
