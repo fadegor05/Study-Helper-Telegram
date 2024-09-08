@@ -26,5 +26,5 @@ def menu_dialogs():
         ),
         Dialog(
             windows.hometask_delete_window(),
-        )
+        ),
     ]
