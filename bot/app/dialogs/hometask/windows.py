@@ -31,7 +31,7 @@ def hometask_info_window():
     return Window(
         DynamicMedia("image_last"),
         Format(
-            "*{date} {lesson}*\n{is_completed}\n\n{task}\n\n*Материалы* 📚\n{books}\n\n*Автор* 🔗\n@{author_username}"
+            "*{date} {lesson}*\n{is_completed}\n\n{task}\n\n*Материалы* 📚\n{books}\n\n🔗 *Автор* @{author_username}{completed_by_str}"
         ),
         Button(
             Format("{is_completed_button}"),
