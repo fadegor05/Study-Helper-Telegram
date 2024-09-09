@@ -10,7 +10,7 @@ async def get_amount_hometasks_uncompleted(telegram_id: int):
     connection = await mongo_connection()
     hometask_collection = await mongo_get_collection(connection, "hometasks")
     return hometask_collection.count_documents(
-        {"completed_by": {"$nin": [telegram_id]}}
+        {"completed_by": {"$nin": [telegram_id]}, "$or": [{"is_hidden": {"$exists": False}}, {"is_hidden": False}]}
     )
 
 
@@ -18,7 +18,7 @@ async def get_tomorrow_amount_hometasks_uncompleted(telegram_id: int):
     connection = await mongo_connection()
     hometask_collection = await mongo_get_collection(connection, "hometasks")
     uncompleted_hometasks = hometask_collection.find(
-        {"completed_by": {"$nin": [telegram_id]}}
+        {"completed_by": {"$nin": [telegram_id]}, "$or": [{"is_hidden": {"$exists": False}}, {"is_hidden": False}]}
     )
     tomorrow = (datetime.today() + timedelta(days=1)).date()
     if tomorrow == 7:
