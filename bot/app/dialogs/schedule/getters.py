@@ -16,7 +16,7 @@ async def get_schedule_day(dialog_manager: DialogManager, **kwargs):
     lessons = []
     for lesson in schedule_day.get("lessons"):
         if lesson["classroom"] and lesson["building"]:
-            lesson.update(place=f'({lesson['classroom']},{lesson['building']} корпус)')
+            lesson.update(place=f'({lesson['classroom']})')
         else:
             lesson.update(place="")
         lesson.update(
