@@ -14,7 +14,7 @@ def paginated_hometasks(on_click):
         ),
         id="hometasks_id",
         width=1,
-        height=5,
+        height=8,
     )
 
 
