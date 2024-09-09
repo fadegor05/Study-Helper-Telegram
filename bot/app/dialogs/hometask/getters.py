@@ -65,6 +65,7 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
         image_last = MediaAttachment(
             ContentType.PHOTO, file_id=MediaId(hometask.get("images")[-1])
         )
+    completed_by_amount = len(hometask.get("completed_by"))
     return {
         "lesson": hometask.get("lesson"),
         "is_completed": "Выполнено ✅" if is_completed else "Не выполнено ⏳",
@@ -77,6 +78,9 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
         "image_last": image_last,
         "author_username": author.get("username"),
         "is_editor": is_editor,
+        "completed_by_str": f"\n\n🏁 *Выполнили* {completed_by_amount}"
+        if completed_by_amount > 0
+        else "",
     }
 
 
