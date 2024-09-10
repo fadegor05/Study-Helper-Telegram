@@ -66,6 +66,14 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
             ContentType.PHOTO, file_id=MediaId(hometask.get("images")[-1])
         )
     completed_by_amount = len(hometask.get("completed_by"))
+
+    editor_id = hometask.get("editor_id")
+    edited_at = hometask.get("edited_at")
+    editor_at_str = None
+    editor = None
+    if editor_id and edited_at:
+        edited_at_str = datetime.fromisoformat(edited_at).strftime("%d.%m %H:%M")
+        editor = await get_user_by_telegram_id(editor_id)
     return {
         "lesson": hometask.get("lesson"),
         "is_completed": "Выполнено ✅" if is_completed else "Не выполнено ⏳",
@@ -80,6 +88,9 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
         "is_editor": is_editor,
         "completed_by_str": f"\n\n🏁 *Выполнили* {completed_by_amount}"
         if completed_by_amount > 0
+        else "",
+        "edited_str": f"\n✏️ *Изменено {edited_at_str}* @{editor.get('username')}"
+        if editor_id and edited_at
         else "",
     }
 

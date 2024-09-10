@@ -39,36 +39,50 @@ async def get_tomorrow_amount_hometasks_uncompleted(telegram_id: int):
 async def get_hometasks_all_sorted(telegram_id: int):
     connection = await mongo_connection()
     hometask_collection = await mongo_get_collection(connection, "hometasks")
+
     tomorrow = (datetime.today() + timedelta(days=1)).date()
-    if tomorrow == 7:
-        tomorrow += timedelta(days=1)
+
     uncompleted = list(
         hometask_collection.find(
             {
                 "completed_by": {"$nin": [telegram_id]},
                 "$or": [{"is_hidden": {"$exists": False}}, {"is_hidden": False}],
             }
-        ).sort({"date": -1})
+        )
     )
-    uncompleted.sort(key=lambda x: datetime.fromisoformat(x["date"]).date() != tomorrow)
+
     completed = list(
         hometask_collection.find(
             {
                 "completed_by": {"$in": [telegram_id]},
                 "$or": [{"is_hidden": {"$exists": False}}, {"is_hidden": False}],
             }
-        ).sort({"date": -1})
+        )
     )
-    completed.sort(key=lambda x: datetime.fromisoformat(x["date"]).date() != tomorrow)
-    for hometask in completed:
-        uncompleted.append(hometask)
-    return uncompleted
+
+    def custom_sort(hometask):
+        task_date = datetime.fromisoformat(hometask["date"]).date()
+        if task_date >= tomorrow:
+            return (0, task_date)
+        else:
+            return (1, -task_date.toordinal())
+
+    uncompleted.sort(key=custom_sort)
+    completed.sort(key=custom_sort)
+
+    sorted_hometasks = uncompleted + completed
+
+    return sorted_hometasks
 
 
-async def update_hometask_task_by_uuid(hometask_uuid: str, task: str):
+async def update_hometask_task_by_uuid(hometask_uuid: str, task: str, editor_id: int):
     connection = await mongo_connection()
     hometask_collection = await mongo_get_collection(connection, "hometasks")
-    hometask_collection.update_one({"uuid": hometask_uuid}, {"$set": {"task": task}})
+    now = datetime.now() + timedelta(hours=1)
+    hometask_collection.update_one(
+        {"uuid": hometask_uuid},
+        {"$set": {"task": task, "edited_at": now.isoformat(), "editor_id": editor_id}},
+    )
 
 
 async def update_hometask_date_by_uuid(hometask_uuid: str, date: str):

@@ -177,9 +177,10 @@ async def on_entered_edit_task(
 async def on_done_edit_hometask(
     c: CallbackQuery, widget: Button, manager: DialogManager
 ):
+    editor_id = int(manager.middleware_data.get("event_chat").id)
     hometask_uuid = manager.start_data.get("hometask_uuid")
     task = manager.dialog_data.get("task")
-    await update_hometask_task_by_uuid(hometask_uuid, task)
+    await update_hometask_task_by_uuid(hometask_uuid, task, editor_id)
     await c.answer("Задание было успешно обновлено ✅")
     await manager.done()
 

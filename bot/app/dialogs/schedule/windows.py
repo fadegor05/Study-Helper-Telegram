@@ -12,7 +12,7 @@ def schedule_window():
         Button(
             Const("🕒 Завтра"), "tomorrow_schedule_button", callbacks.on_chosen_tomorrow
         ),
-        keyboards.paginated_schedule(callbacks.on_chosen_schedule_day),
+        keyboards.column_schedule(callbacks.on_chosen_schedule_day),
         Cancel(Const("⬅️ Назад")),
         state=states.ScheduleMenu.select_schedule,
         getter=getters.get_schedule,
@@ -22,7 +22,7 @@ def schedule_window():
 def schedule_day_window():
     return Window(
         Format("*{name} *📆"),
-        keyboards.paginated_lessons(),
+        keyboards.column_lessons(),
         Cancel(Const("⬅️ Назад")),
         state=states.ScheduleInfo.info_schedule,
         getter=getters.get_schedule_day,
