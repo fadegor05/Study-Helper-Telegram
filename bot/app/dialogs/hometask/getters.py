@@ -12,6 +12,7 @@ from app.crud.lesson import get_lesson_by_uuid, get_lessons_all
 from aiogram_dialog.api.entities import MediaAttachment, MediaId
 from aiogram.enums.content_type import ContentType
 
+from app.crud.material import get_materials_by_lesson_uuid
 from app.crud.schedule import get_lesson_weekdays_by_uuid
 from app.crud.user import is_user_editor_by_telegram_id, get_user_by_telegram_id
 
@@ -59,12 +60,6 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
     author = await get_user_by_telegram_id(hometask.get("author_id"))
     is_editor = await is_user_editor_by_telegram_id(user_id)
     lesson = await get_lesson_by_uuid(hometask.get("lesson_uuid"))
-    books_list = lesson.get("books")
-    books = (
-        "\n".join([f"{book} - {books_list.get(book)}" for book in books_list])
-        if books_list
-        else "..."
-    )
     is_completed = True if user_id in hometask.get("completed_by") else False
     image_last = None
     if hometask.get("images") and len(hometask.get("images")) > 0:
@@ -72,7 +67,6 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
             ContentType.PHOTO, file_id=MediaId(hometask.get("images")[-1])
         )
     completed_by_amount = len(hometask.get("completed_by"))
-
     editor_id = hometask.get("editor_id")
     edited_at = hometask.get("edited_at")
     editor_at_str = None
@@ -82,6 +76,9 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
         editor = await get_user_by_telegram_id(editor_id)
     hometask_date = datetime.fromisoformat(hometask.get("date")).date()
     tomorrow = (datetime.now() + timedelta(days=1)).date()
+
+    materials = await get_materials_by_lesson_uuid(lesson.get("uuid"))
+    materials_str = f"\n\n*Материалы* 📚\n" + "\n".join([f"[{material.get('name')}]({material.get('link')})" for material in materials]) if len(materials) > 0 else ""
     return {
         "lesson": hometask.get("lesson"),
         "is_completed": "Выполнено ✅"
@@ -94,7 +91,6 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
         else "❌ Отменить выполнение",
         "task": hometask.get("task"),
         "date": datetime.fromisoformat(hometask.get("date")).strftime("%d.%m"),
-        "books": books,
         "image_last": image_last,
         "author_username": author.get("username"),
         "is_editor": is_editor,
@@ -104,6 +100,7 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
         "edited_str": f"\n✏️ *Изменено {edited_at_str}* @{editor.get('username')}"
         if editor_id and edited_at
         else "",
+        "materials_str": materials_str,
     }
 
 
