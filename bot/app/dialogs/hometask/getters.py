@@ -31,7 +31,7 @@ async def get_hometasks(dialog_manager: DialogManager, **kwargs):
             date=hometask_date.strftime("%d.%m"),
             is_completed="✅"
             if user_id in hometask.get("completed_by")
-            else "🔔"
+            else "⭐"
             if hometask_date.date() == tomorrow
             else "⏳",
         )
@@ -86,7 +86,7 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
         "lesson": hometask.get("lesson"),
         "is_completed": "Выполнено ✅"
         if is_completed
-        else "Не выполнено 🔔"
+        else "Не выполнено ⭐"
         if hometask_date == tomorrow
         else "Не выполнено ⏳",
         "is_completed_button": "✅ Выполнено"
