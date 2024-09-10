@@ -7,7 +7,7 @@ from aiogram_dialog.widgets.text import Format
 def column_schedule(on_click):
     return Group(
         Select(
-            Format("📆 {item[name]}"),
+            Format("{item[is_today_str]}{item[name]} 📆"),
             id="s_scroll_schedule",
             item_id_getter=operator.itemgetter("day"),
             items="schedule",

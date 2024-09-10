@@ -7,6 +7,11 @@ from app.crud.schedule import get_all_schedule_sorted, get_day_schedule
 
 async def get_schedule(dialog_manager: DialogManager, **kwargs):
     schedule = await get_all_schedule_sorted()
+    for day in schedule:
+        if int(day.get('day')) == datetime.now().isoweekday():
+            day.update(is_today_str="📍 ")
+        else:
+            day.update(is_today_str="")
     return {"schedule": schedule}
 
 
