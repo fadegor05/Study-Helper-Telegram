@@ -20,4 +20,4 @@ async def get_material_by_uuid(uuid: str):
 async def get_materials_by_lesson_uuid(lesson_uuid: str):
     connection = await mongo_connection()
     material_collection = await mongo_get_collection(connection, "materials")
-    return material_collection.find({"lesson_uuid": lesson_uuid})
+    return list(material_collection.find({"lesson_uuid": lesson_uuid}))
