@@ -23,11 +23,17 @@ async def get_hometasks(dialog_manager: DialogManager, **kwargs):
     tomorrow_uncompleted_tasks_amount = await get_tomorrow_amount_hometasks_uncompleted(
         user_id
     )
+    tomorrow = (datetime.now() + timedelta(days=1)).date()
     hometasks = []
     for hometask in await get_hometasks_all_sorted(user_id):
+        hometask_date = datetime.fromisoformat(hometask.get("date"))
         hometask.update(
-            date=datetime.fromisoformat(hometask.get("date")).strftime("%d.%m"),
-            is_completed="✅" if user_id in hometask.get("completed_by") else "⏳",
+            date=hometask_date.strftime("%d.%m"),
+            is_completed="✅"
+            if user_id in hometask.get("completed_by")
+            else "🔔"
+            if hometask_date.date() == tomorrow
+            else "⏳",
         )
         hometasks.append(hometask)
     return {
@@ -74,9 +80,15 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
     if editor_id and edited_at:
         edited_at_str = datetime.fromisoformat(edited_at).strftime("%d.%m %H:%M")
         editor = await get_user_by_telegram_id(editor_id)
+    hometask_date = datetime.fromisoformat(hometask.get("date")).date()
+    tomorrow = (datetime.now() + timedelta(days=1)).date()
     return {
         "lesson": hometask.get("lesson"),
-        "is_completed": "Выполнено ✅" if is_completed else "Не выполнено ⏳",
+        "is_completed": "Выполнено ✅"
+        if is_completed
+        else "Не выполнено 🔔"
+        if hometask_date == tomorrow
+        else "Не выполнено ⏳",
         "is_completed_button": "✅ Выполнено"
         if not is_completed
         else "❌ Отменить выполнение",
