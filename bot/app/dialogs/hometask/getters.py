@@ -89,7 +89,9 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
         "completed_by_str": f"\n\n🏁 *Выполнили* {completed_by_amount}"
         if completed_by_amount > 0
         else "",
-        "edited_str": f"\n✏️ *Изменено {edited_at_str}* @{editor.get('username')}" if editor_id and edited_at else ""
+        "edited_str": f"\n✏️ *Изменено {edited_at_str}* @{editor.get('username')}"
+        if editor_id and edited_at
+        else "",
     }
 
 
