@@ -65,10 +65,11 @@ async def get_hometasks_all_sorted(telegram_id: int):
     return uncompleted
 
 
-async def update_hometask_task_by_uuid(hometask_uuid: str, task: str):
+async def update_hometask_task_by_uuid(hometask_uuid: str, task: str, editor_id: int):
     connection = await mongo_connection()
     hometask_collection = await mongo_get_collection(connection, "hometasks")
-    hometask_collection.update_one({"uuid": hometask_uuid}, {"$set": {"task": task}})
+    now = datetime.now() + timedelta(hours=1)
+    hometask_collection.update_one({"uuid": hometask_uuid}, {"$set": {"task": task, "edited_at": now.isoformat(), "editor_id": editor_id}})
 
 
 async def update_hometask_date_by_uuid(hometask_uuid: str, date: str):
