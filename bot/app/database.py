@@ -10,6 +10,7 @@ COLLECTIONS = [
     "lessons",
     "hometasks",
     "schedule",
+    "materials",
 ]
 
 
