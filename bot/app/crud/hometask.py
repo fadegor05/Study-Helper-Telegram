@@ -81,14 +81,14 @@ async def update_hometask_task_by_uuid(hometask_uuid: str, task: str, editor_id:
     now = datetime.now() + timedelta(hours=1)
     hometask_collection.update_one(
         {"uuid": hometask_uuid},
-        {"$set": {"task": task, "edited_at": now.isoformat(), "editor_id": editor_id}},
+        {"$set": {"task": task, "edited_at": now.isoformat(), "editor_id": editor_id, "completed_by": []}},
     )
 
 
 async def update_hometask_date_by_uuid(hometask_uuid: str, date: str):
     connection = await mongo_connection()
     hometask_collection = await mongo_get_collection(connection, "hometasks")
-    hometask_collection.update_one({"uuid": hometask_uuid}, {"$set": {"date": date}})
+    hometask_collection.update_one({"uuid": hometask_uuid}, {"$set": {"date": date, "completed_by": []}})
 
 
 async def get_hometasks_all():
