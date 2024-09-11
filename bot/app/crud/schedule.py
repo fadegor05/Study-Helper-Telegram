@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from app.database import mongo_connection, mongo_get_collection
 
 
@@ -66,3 +68,10 @@ async def insert_schedule(schedule: list):
     connection = await mongo_connection()
     schedule_collection = await mongo_get_collection(connection, "schedule")
     schedule_collection.insert_many(schedule)
+
+
+async def get_first_last_lesson_datetime_by_day(day: int) -> (datetime, datetime):
+    day = await get_day_schedule(day)
+    lessons = day.get("lessons")
+    return datetime.fromisoformat(lessons[0].get("start_time")), datetime.fromisoformat(lessons[-1].get("start_time"))
+

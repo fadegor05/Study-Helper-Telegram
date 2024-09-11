@@ -8,12 +8,15 @@ from aiogram.fsm.storage.redis import RedisStorage
 from apscheduler.triggers.cron import CronTrigger
 
 from app.apsched.hometask import hometask_notification
+from app.apsched.weather import update_weather
 from app.database import mongo_connection, mongo_init
 from aiogram_dialog import setup_dialogs
 from app.dialogs import get_dialogs
 from app.handlers.router import router
 from app.core.config import TELEGRAM_TOKEN, REDIS_URL
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
+from app.openmeteo.service import update_weather_from_openmeteo
 
 
 async def main() -> None:
@@ -34,8 +37,13 @@ async def main() -> None:
         trigger=CronTrigger(day_of_week="0-4,6", hour=16, minute=0),
         kwargs={"bot": bot},
     )
+    scheduler.add_job(
+        update_weather,
+        trigger=CronTrigger(hour=16, minute=5),
+    )
     scheduler.start()
 
+    await update_weather_from_openmeteo()
     await dp.start_polling(bot)
 
 
