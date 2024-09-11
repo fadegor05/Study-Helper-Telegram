@@ -11,6 +11,7 @@ COLLECTIONS = [
     "hometasks",
     "schedule",
     "materials",
+    "weather"
 ]
 
 
