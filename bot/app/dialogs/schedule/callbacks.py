@@ -9,11 +9,11 @@ from app.dialogs.schedule.states import ScheduleInfo
 
 
 async def on_chosen_schedule_day(
-    c: CallbackQuery,
-    widget: Select,
-    manager: DialogManager,
-    schedule_day: int,
-    **kwargs,
+        c: CallbackQuery,
+        widget: Select,
+        manager: DialogManager,
+        schedule_day: int,
+        **kwargs,
 ):
     await manager.start(ScheduleInfo.info_schedule, {"schedule_day": schedule_day})
 
@@ -30,9 +30,33 @@ async def on_chosen_today(c: CallbackQuery, widget: Button, manager: DialogManag
 
 async def on_chosen_tomorrow(c: CallbackQuery, widget: Button, manager: DialogManager):
     day = datetime.today().isoweekday() + 1
-    if day == 8:
+    if day >= 7:
         day = 1
     if await get_day_schedule(day):
         await manager.start(ScheduleInfo.info_schedule, {"schedule_day": day})
+    else:
+        await c.answer("Расписание на данный день отсутствует ❌")
+
+
+async def next_day(c: CallbackQuery, widget: Button, manager: DialogManager):
+    day = int(manager.start_data.get("schedule_day"))
+    day += 1
+    if day >= 7:
+        day = 1
+    if await get_day_schedule(day):
+        manager.start_data.update(schedule_day=day)
+        await manager.show()
+    else:
+        await c.answer("Расписание на данный день отсутствует ❌")
+
+
+async def previous_day(c: CallbackQuery, widget: Button, manager: DialogManager):
+    day = int(manager.start_data.get("schedule_day"))
+    day -= 1
+    if day <= 0:
+        day = 6
+    if await get_day_schedule(day):
+        manager.start_data.update(schedule_day=day)
+        await manager.show()
     else:
         await c.answer("Расписание на данный день отсутствует ❌")

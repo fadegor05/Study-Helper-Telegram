@@ -58,13 +58,16 @@ async def get_schedule_from_mstimetables() -> (
             classroom, building = None, None
             if lesson["cabinet"]:
                 classroom, building = await parse_classroom(lesson["cabinet"]["name"])
+            start_time = lesson['startTime']
+            if lesson['startTime'] == "13:40":
+                start_time = "13:10"
             week[lesson["weekday"]]["lessons"].append(
                 {
                     "lesson_uuid": str(lesson["subject"]["id"]),
                     "name": lesson["subject"]["name"],
                     "building": building,
                     "classroom": classroom,
-                    "start_time": f'2024-01-01T{lesson['startTime']}:00',
+                    "start_time": f'2024-01-01T{start_time}:00',
                 }
             )
     week = [week[key] for key in sorted(week.keys())]
