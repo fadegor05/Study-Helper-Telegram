@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from app.database import mongo_connection, mongo_get_collection
 
@@ -73,5 +73,5 @@ async def insert_schedule(schedule: list):
 async def get_first_last_lesson_datetime_by_day(day: int) -> (datetime, datetime):
     day = await get_day_schedule(day)
     lessons = day.get("lessons")
-    return datetime.fromisoformat(lessons[0].get("start_time")), datetime.fromisoformat(lessons[-1].get("start_time"))
+    return datetime.fromisoformat(lessons[0].get("start_time")), datetime.fromisoformat(lessons[-1].get("start_time"))+timedelta(minutes=40)
 
