@@ -5,16 +5,6 @@ from aiogram_dialog import DialogManager
 from app.crud.schedule import get_all_schedule_sorted, get_day_schedule
 
 
-async def get_schedule(dialog_manager: DialogManager, **kwargs):
-    schedule = await get_all_schedule_sorted()
-    for day in schedule:
-        if int(day.get("day")) == datetime.now().isoweekday():
-            day.update(is_today_str="📍 ")
-        else:
-            day.update(is_today_str="")
-    return {"schedule": schedule}
-
-
 async def get_schedule_day(dialog_manager: DialogManager, **kwargs):
     day = int(dialog_manager.start_data.get("schedule_day"))
     schedule_day = await get_day_schedule(day)
