@@ -5,6 +5,5 @@ from app.dialogs.schedule import windows
 
 def menu_dialogs():
     return [
-        Dialog(windows.schedule_window()),
         Dialog(windows.schedule_day_window()),
     ]

@@ -4,18 +4,6 @@ from aiogram_dialog.widgets.kbd import ScrollingGroup, Select, ListGroup, Column
 from aiogram_dialog.widgets.text import Format
 
 
-def column_schedule(on_click):
-    return Group(
-        Select(
-            Format("{item[is_today_str]}{item[name]} 📆"),
-            id="s_scroll_schedule",
-            item_id_getter=operator.itemgetter("day"),
-            items="schedule",
-            on_click=on_click,
-        ),
-        width=2,
-    )
-
 
 def column_lessons():
     return Column(
