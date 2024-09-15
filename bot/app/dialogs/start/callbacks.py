@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from aiogram.types import CallbackQuery
 
@@ -22,8 +22,10 @@ async def on_chosen_schedule(c: CallbackQuery, widget: Button, manager: DialogMa
     while i < 7:
         for day in schedule:
             if today.isoweekday() == int(day.get("day")):
-                await manager.start(ScheduleMenu.info_schedule, {"schedule_day": int(today.isoweekday())+i})
+                await manager.start(ScheduleMenu.info_schedule, {"schedule_day": int(today.isoweekday())})
                 return
+        today += timedelta(days=1)
+        i += 1
 
 
 async def on_chosen_settings(c: CallbackQuery, widget: Button, manager: DialogManager):
