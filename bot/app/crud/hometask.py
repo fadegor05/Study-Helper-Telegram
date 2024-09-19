@@ -96,6 +96,13 @@ async def get_hometasks_all():
     hometask_collection = await mongo_get_collection(connection, "hometasks")
     return hometask_collection.find({})
 
+async def get_hometask_by_lesson_uuid_and_datetime(lesson_uuid: str, date: datetime):
+    connection = await mongo_connection()
+    hometask_collection = await mongo_get_collection(connection, "hometasks")
+    formatted_date = date.strftime("%Y-%m-%d")
+    hometask_date = datetime.fromisoformat(f"{formatted_date}T10:00:00")
+    hometasks = hometask_collection.find_one({"lesson_uuid": lesson_uuid, "date": hometask_date.isoformat(), "$or": [{"is_hidden": {"$exists": False}}, {"is_hidden": False}]})
+    return hometasks
 
 async def get_hometask_by_uuid(hometask_uuid: str):
     connection = await mongo_connection()
