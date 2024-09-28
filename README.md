@@ -60,9 +60,11 @@
 ```
 telegram_id: int
 username: str
-is_editor: boolean
-hometask_notification: boolean
-schedule_notification: boolean
+hometask_notification: bool
+schedule_notification: bool
+have_access: bool
+is_editor: boolean | None
+is_admin: bool | None
 ```
 
 ### hometasks
@@ -75,6 +77,9 @@ task: str
 date: str
 completed_by: [int]
 images: [str]
+author_id: int
+edited_at: str | None
+editor_id: int | None
 ```
 
 ### lessons
@@ -99,4 +104,25 @@ lessons: [
         building: str
     }
 ]
+```
+
+### weather
+
+```
+date: str
+morning_temperature: float
+morning_icon: str
+morning_datetime: str
+day_temperature: float
+day_icon: str
+day_datetime: str
+```
+
+### materials
+
+```
+uuid: str
+lesson_uuid: str
+link: str
+name: str
 ```
