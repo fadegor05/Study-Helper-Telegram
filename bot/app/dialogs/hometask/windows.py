@@ -31,12 +31,18 @@ def hometask_info_window():
     return Window(
         DynamicMedia("image_last"),
         Format(
-            "*{date} {lesson}*\n{is_completed}\n\n{task}{materials_str}\n\n🔗 *Автор* @{author_username}{edited_str}{completed_by_str}"
+            "*{date} {lesson}*\n{status_str}\n\n{task}{materials_str}\n\n🔗 *Автор* @{author_username}{edited_str}{completed_by_str}"
         ),
         Button(
-            Format("{is_completed_button}"),
-            "status_change_hometask_button",
+            Format("{status_button}"),
+            "status_button",
             callbacks.change_hometask_status,
+        ),
+        Button(
+            Format("{skip_button}"),
+            "skip_button",
+            callbacks.skip_hometask_status,
+            when=utils.is_not_completed,
         ),
         Button(
             Const("✏️ Изменить задание"),

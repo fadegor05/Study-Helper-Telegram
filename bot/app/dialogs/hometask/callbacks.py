@@ -7,12 +7,12 @@ from aiogram_dialog.widgets.kbd import Select, Button
 from aiogram_dialog.widgets.input import MessageInput, TextInput
 
 from app.crud.hometask import (
-    change_hometask_status_by_uuid_and_user_id,
     create_hometask,
     get_hometask_by_uuid,
     update_hometask_task_by_uuid,
     update_hometask_date_by_uuid,
-    hide_hometask_by_uuid,
+    hide_hometask_by_uuid, uncomplete_hometask_by_uuid_and_telegram_uuid, complete_hometask_by_uuid_and_telegram_uuid,
+    skip_hometask_by_uuid_and_telegram_uuid,
 )
 from app.crud.schedule import get_lesson_weekdays_by_uuid
 from app.crud.user import is_user_editor_by_telegram_id
@@ -50,7 +50,28 @@ async def change_hometask_status(
 ):
     hometask_uuid = manager.start_data.get("hometask_uuid")
     user_id = manager.middleware_data.get("event_chat").id
-    await change_hometask_status_by_uuid_and_user_id(hometask_uuid, user_id)
+    hometask = await get_hometask_by_uuid(hometask_uuid)
+
+    status_id = hometask.get("statuses").get(str(user_id))
+    if status_id == 1:
+        await uncomplete_hometask_by_uuid_and_telegram_uuid(hometask_uuid, user_id)
+        return
+    await complete_hometask_by_uuid_and_telegram_uuid(hometask_uuid, user_id)
+
+
+
+async def skip_hometask_status(
+    c: CallbackQuery, widget: Button, manager: DialogManager
+):
+    hometask_uuid = manager.start_data.get("hometask_uuid")
+    user_id = manager.middleware_data.get("event_chat").id
+    hometask = await get_hometask_by_uuid(hometask_uuid)
+
+    status_id = hometask.get("statuses").get(str(user_id))
+    if status_id == 0:
+        await uncomplete_hometask_by_uuid_and_telegram_uuid(hometask_uuid, user_id)
+        return
+    await skip_hometask_by_uuid_and_telegram_uuid(hometask_uuid, user_id)
 
 
 async def on_create_hometask(c: CallbackQuery, widget: Button, manager: DialogManager):

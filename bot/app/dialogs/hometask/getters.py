@@ -28,13 +28,17 @@ async def get_hometasks(dialog_manager: DialogManager, **kwargs):
     hometasks = []
     for hometask in await get_hometasks_all_sorted(user_id):
         hometask_date = datetime.fromisoformat(hometask.get("date"))
+        status_id = hometask.get("statuses").get(str(user_id))
+        status = "⏳"
+        if status_id is None and hometask_date.date() == tomorrow:
+            status = "⭐"
+        elif status_id == 0:
+            status = "📦"
+        elif status_id == 1:
+            status = "✅"
         hometask.update(
             date=hometask_date.strftime("%d.%m"),
-            is_completed="✅"
-            if user_id in hometask.get("completed_by")
-            else "⭐"
-            if hometask_date.date() == tomorrow
-            else "⏳",
+            status=status
         )
         hometasks.append(hometask)
     return {
@@ -60,13 +64,12 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
     author = await get_user_by_telegram_id(hometask.get("author_id"))
     is_editor = await is_user_editor_by_telegram_id(user_id)
     lesson = await get_lesson_by_uuid(hometask.get("lesson_uuid"))
-    is_completed = True if user_id in hometask.get("completed_by") else False
     image_last = None
     if hometask.get("images") and len(hometask.get("images")) > 0:
         image_last = MediaAttachment(
             ContentType.PHOTO, file_id=MediaId(hometask.get("images")[-1])
         )
-    completed_by_amount = len(hometask.get("completed_by"))
+    completed_by_amount = sum(1 for v in hometask.get("statuses").values() if v == 1)
     editor_id = hometask.get("editor_id")
     edited_at = hometask.get("edited_at")
     editor_at_str = None
@@ -77,18 +80,29 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
     hometask_date = datetime.fromisoformat(hometask.get("date")).date()
     tomorrow = (datetime.now() + timedelta(days=1)).date()
 
+    is_completed = False
+    status_id = hometask.get("statuses").get(str(user_id))
+    status = "Не выполнено ⏳"
+    status_button = "✅ Выполнено"
+    skip_button = "📦 Пропустить"
+    if status_id is None and hometask_date == tomorrow:
+        status = "Рекомендуется ⭐"
+    elif status_id == 0:
+        status = "Пропущено 📦"
+        skip_button = "⏳ Вернуть задание"
+    elif status_id == 1:
+        status = "Выполнено ✅"
+        status_button = "❌ Отменить выполнение"
+        is_completed = True
+
     materials = await get_materials_by_lesson_uuid(lesson.get("uuid"))
     materials_str = f"\n\n*Материалы* 📚\n" + "\n".join([f"[{material.get('name')}]({material.get('link')})" for material in materials]) if len(materials) > 0 else ""
     return {
         "lesson": hometask.get("lesson"),
-        "is_completed": "Выполнено ✅"
-        if is_completed
-        else "Не выполнено ⭐"
-        if hometask_date == tomorrow
-        else "Не выполнено ⏳",
-        "is_completed_button": "✅ Выполнено"
-        if not is_completed
-        else "❌ Отменить выполнение",
+        "status_str": status,
+        "is_completed": is_completed,
+        "status_button": status_button,
+        "skip_button": skip_button,
         "task": hometask.get("task"),
         "date": datetime.fromisoformat(hometask.get("date")).strftime("%d.%m"),
         "image_last": image_last,
