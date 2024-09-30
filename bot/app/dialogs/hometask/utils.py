@@ -14,3 +14,7 @@ def is_lesson_in_schedule(data: Dict, widget: Whenable, manager: DialogManager):
 
 def is_lesson_not_in_schedule(data: Dict, widget: Whenable, manager: DialogManager):
     return not data.get("in_schedule")
+
+
+def is_not_completed(data: Dict, widget: Whenable, manager: DialogManager):
+    return not data.get("is_completed")

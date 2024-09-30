@@ -80,21 +80,29 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
     hometask_date = datetime.fromisoformat(hometask.get("date")).date()
     tomorrow = (datetime.now() + timedelta(days=1)).date()
 
+    is_completed = False
     status_id = hometask.get("statuses").get(str(user_id))
     status = "Не выполнено ⏳"
+    status_button = "✅ Выполнено"
+    skip_button = "📦 Пропустить"
     if status_id is None and hometask_date == tomorrow:
         status = "Рекомендуется ⭐"
     elif status_id == 0:
         status = "Пропущено 📦"
+        skip_button = "⏳ Вернуть задание"
     elif status_id == 1:
         status = "Выполнено ✅"
+        status_button = "❌ Отменить выполнение"
+        is_completed = True
 
     materials = await get_materials_by_lesson_uuid(lesson.get("uuid"))
     materials_str = f"\n\n*Материалы* 📚\n" + "\n".join([f"[{material.get('name')}]({material.get('link')})" for material in materials]) if len(materials) > 0 else ""
     return {
         "lesson": hometask.get("lesson"),
         "status_str": status,
-        "is_completed_button": "-",
+        "is_completed": is_completed,
+        "status_button": status_button,
+        "skip_button": skip_button,
         "task": hometask.get("task"),
         "date": datetime.fromisoformat(hometask.get("date")).strftime("%d.%m"),
         "image_last": image_last,
