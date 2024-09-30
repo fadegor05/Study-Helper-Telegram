@@ -29,10 +29,8 @@ async def get_hometasks(dialog_manager: DialogManager, **kwargs):
     for hometask in await get_hometasks_all_sorted(user_id):
         hometask_date = datetime.fromisoformat(hometask.get("date"))
         status_id = hometask.get("statuses").get(str(user_id))
-        status = ""
-        if status_id is None:
-            status = "⏳"
-        elif hometask_date.date() == tomorrow:
+        status = "⏳"
+        if status_id is None and hometask_date.date() == tomorrow:
             status = "⭐"
         elif status_id == 0:
             status = "📦"
