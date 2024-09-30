@@ -64,13 +64,12 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
     author = await get_user_by_telegram_id(hometask.get("author_id"))
     is_editor = await is_user_editor_by_telegram_id(user_id)
     lesson = await get_lesson_by_uuid(hometask.get("lesson_uuid"))
-    is_completed = True if user_id in hometask.get("completed_by") else False
     image_last = None
     if hometask.get("images") and len(hometask.get("images")) > 0:
         image_last = MediaAttachment(
             ContentType.PHOTO, file_id=MediaId(hometask.get("images")[-1])
         )
-    completed_by_amount = len(hometask.get("completed_by"))
+    completed_by_amount = sum(1 for v in hometask.get("statuses").values() if v == 1)
     editor_id = hometask.get("editor_id")
     edited_at = hometask.get("edited_at")
     editor_at_str = None
@@ -81,18 +80,21 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
     hometask_date = datetime.fromisoformat(hometask.get("date")).date()
     tomorrow = (datetime.now() + timedelta(days=1)).date()
 
+    status_id = hometask.get("statuses").get(str(user_id))
+    status = "Не выполнено ⏳"
+    if status_id is None and hometask_date == tomorrow:
+        status = "Рекомендуется ⭐"
+    elif status_id == 0:
+        status = "Пропущено 📦"
+    elif status_id == 1:
+        status = "Выполнено ✅"
+
     materials = await get_materials_by_lesson_uuid(lesson.get("uuid"))
     materials_str = f"\n\n*Материалы* 📚\n" + "\n".join([f"[{material.get('name')}]({material.get('link')})" for material in materials]) if len(materials) > 0 else ""
     return {
         "lesson": hometask.get("lesson"),
-        "is_completed": "Выполнено ✅"
-        if is_completed
-        else "Не выполнено ⭐"
-        if hometask_date == tomorrow
-        else "Не выполнено ⏳",
-        "is_completed_button": "✅ Выполнено"
-        if not is_completed
-        else "❌ Отменить выполнение",
+        "status_str": status,
+        "is_completed_button": "-",
         "task": hometask.get("task"),
         "date": datetime.fromisoformat(hometask.get("date")).strftime("%d.%m"),
         "image_last": image_last,
