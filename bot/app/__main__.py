@@ -16,12 +16,16 @@ from app.handlers.router import router
 from app.core.config import TELEGRAM_TOKEN, REDIS_URL
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
+from app.migrations.migrations import mongo_migrate
 from app.openmeteo.service import update_weather_from_openmeteo
 
 
 async def main() -> None:
     connection = await mongo_connection()
     await mongo_init(connection)
+
+    await mongo_migrate()
+
     storage = RedisStorage.from_url(REDIS_URL)
     storage.key_builder.with_destiny = True
 
