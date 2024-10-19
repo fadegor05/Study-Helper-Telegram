@@ -27,7 +27,7 @@ async def get_hometasks(dialog_manager: DialogManager, **kwargs):
     tomorrow = (datetime.now() + timedelta(days=1)).date()
     hometasks = []
     for hometask in await get_hometasks_all_sorted(user_id):
-        hometask_date = datetime.fromisoformat(hometask.get("date"))
+        hometask_date = hometask.get("date")
         status_id = hometask.get("statuses").get(str(user_id))
         status = "⏳"
         if status_id is None and hometask_date.date() == tomorrow:
@@ -72,12 +72,12 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
     completed_by_amount = sum(1 for v in hometask.get("statuses").values() if v == 1)
     editor_id = hometask.get("editor_id")
     edited_at = hometask.get("edited_at")
-    editor_at_str = None
+    edited_at_str = None
     editor = None
     if editor_id and edited_at:
-        edited_at_str = datetime.fromisoformat(edited_at).strftime("%d.%m %H:%M")
+        edited_at_str = edited_at.strftime("%d.%m %H:%M")
         editor = await get_user_by_telegram_id(editor_id)
-    hometask_date = datetime.fromisoformat(hometask.get("date")).date()
+    hometask_date = hometask.get("date").date()
     tomorrow = (datetime.now() + timedelta(days=1)).date()
 
     is_completed = False
@@ -104,7 +104,7 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
         "status_button": status_button,
         "skip_button": skip_button,
         "task": hometask.get("task"),
-        "date": datetime.fromisoformat(hometask.get("date")).strftime("%d.%m"),
+        "date": hometask.get("date").strftime("%d.%m"),
         "image_last": image_last,
         "author_username": author.get("username"),
         "is_editor": is_editor,
@@ -136,7 +136,7 @@ async def get_dates(dialog_manager: DialogManager, **kwargs):
     lesson_weekdays = await get_lesson_weekdays_by_uuid(lesson_uuid)
     dates = []
     now = datetime.now()
-    start_datetime = datetime(now.year, now.month, now.day, 10, 0, 0)
+    start_datetime = datetime.combine(datetime.today(), datetime.min.time())
     end_datetime = start_datetime + timedelta(days=10)
     in_schedule = True
     if len(lesson_weekdays) == 0:

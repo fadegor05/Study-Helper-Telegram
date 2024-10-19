@@ -4,7 +4,7 @@ from aiogram.types import CallbackQuery
 from aiogram_dialog import DialogManager, StartMode
 from aiogram_dialog.widgets.kbd import Select, Button
 
-from app.crud.hometask import get_hometask_by_lesson_uuid_and_datetime
+from app.crud.hometask import get_hometask_by_lesson_uuid_and_date
 from app.crud.schedule import get_day_schedule
 from app.dialogs.hometask.states import HometaskInfo
 
@@ -38,7 +38,7 @@ async def open_hometask(c: CallbackQuery, widget: Select, manager: DialogManager
     today = datetime.today()
     difference = day - today.isoweekday()
     target_date = today + timedelta(days=difference)
-    hometask = await get_hometask_by_lesson_uuid_and_datetime(lesson_uuid, target_date)
+    hometask = await get_hometask_by_lesson_uuid_and_date(lesson_uuid, target_date.date())
     if hometask:
         await manager.start(HometaskInfo.info_hometask, {"hometask_uuid": hometask.get("uuid"), "day": day}, mode=StartMode.NORMAL)
     else:
