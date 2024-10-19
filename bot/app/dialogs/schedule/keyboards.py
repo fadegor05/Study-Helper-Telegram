@@ -7,7 +7,7 @@ from aiogram_dialog.widgets.text import Format
 def column_lessons(on_click):
     return Column(
         Select(
-            Format("{item[start_time]} {item[name]} {item[place]}"),
+            Format("{item[lesson_str]}"),
             id="s_scroll_lessons",
             item_id_getter=operator.itemgetter("lesson_uuid"),
             items="lessons",

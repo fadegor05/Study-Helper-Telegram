@@ -54,7 +54,7 @@ async def get_schedule_from_mstimetables() -> (
                 week[lesson["weekday"]] = {
                     "day": int(lesson["weekday"]),
                     "name": DAYS[int(lesson["weekday"])],
-                    "lessons": [],
+                    "lessons": {str(i): {"lesson_uuid": None} for i in range(1, 4)},
                 }
             classroom, building = None, None
             if lesson["cabinet"]:
@@ -63,7 +63,7 @@ async def get_schedule_from_mstimetables() -> (
             if lesson['startTime'] == "13:40":
                 start_time = "13:10"
             start_datetime = datetime.combine(datetime.min.date(), datetime.strptime(start_time, "%H:%M").time())
-            week[lesson["weekday"]]["lessons"].append(
+            week[lesson["weekday"]]["lessons"][str(lesson["lesson"])] = (
                 {
                     "lesson_uuid": str(lesson["subject"]["id"]),
                     "name": lesson["subject"]["name"],
