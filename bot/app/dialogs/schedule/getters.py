@@ -12,7 +12,7 @@ async def get_schedule_day(dialog_manager: DialogManager, **kwargs):
     lessons = []
     for _, lesson in schedule_day.get("lessons").items():
         if lesson["lesson_uuid"] is None:
-            lesson["lesson_str"] = "🚫"
+            lesson["lesson_str"] = "🚫 Отсутствует"
             lessons.append(lesson)
         else:
             user_id = int(dialog_manager.middleware_data.get("event_chat").id)
