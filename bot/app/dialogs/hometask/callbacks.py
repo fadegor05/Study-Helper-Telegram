@@ -94,7 +94,7 @@ async def on_chosen_soon_date(c: CallbackQuery, widget: Button, manager: DialogM
     lesson_weekdays = await get_lesson_weekdays_by_uuid(lesson_uuid)
     date = None
     now = datetime.now() + timedelta(days=1)
-    start_datetime = datetime(now.year, now.month, now.day, 10, 0, 0)
+    start_datetime = datetime.combine(datetime.today(), datetime.min.time())
     end_datetime = start_datetime + timedelta(days=7)
 
     current_datetime = start_datetime
@@ -139,7 +139,7 @@ async def on_done_create_hometask(
     date = manager.dialog_data.get("date")
     task = manager.dialog_data.get("task")
     images = manager.dialog_data.get("images")
-    await create_hometask(lesson_uuid, task, date, images, user_id)
+    await create_hometask(lesson_uuid, task, datetime.fromisoformat(date).date(), images, user_id)
     await c.answer("Задание было успешно добавлено ✅")
     await manager.done()
 
@@ -160,7 +160,7 @@ async def on_chosen_edit_date(
     c: CallbackQuery, widget: Select, manager: DialogManager, date: str, **kwargs
 ):
     hometask_uuid = manager.start_data.get("hometask_uuid")
-    await update_hometask_date_by_uuid(hometask_uuid, date)
+    await update_hometask_date_by_uuid(hometask_uuid, datetime.fromisoformat(date).date())
     await c.answer("Дата была успешно изменена ✅")
     await manager.done()
 
@@ -174,13 +174,13 @@ async def on_chosen_soon_edit_date(
     lesson_weekdays = await get_lesson_weekdays_by_uuid(lesson_uuid)
     date = None
     now = datetime.now() + timedelta(days=1)
-    start_datetime = datetime(now.year, now.month, now.day, 10, 0, 0)
+    start_datetime = datetime.combine(datetime.today(), datetime.min.time())
     end_datetime = start_datetime + timedelta(days=7)
 
     current_datetime = start_datetime
     while current_datetime <= end_datetime:
         if current_datetime.isoweekday() in lesson_weekdays:
-            date = current_datetime.isoformat()
+            date = current_datetime
             break
         current_datetime += timedelta(days=1)
     await update_hometask_date_by_uuid(hometask_uuid, date)
