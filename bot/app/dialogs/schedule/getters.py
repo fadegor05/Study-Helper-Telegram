@@ -6,8 +6,8 @@ from app.crud.schedule import get_all_schedule_sorted, get_day_schedule
 
 
 async def get_schedule_day(dialog_manager: DialogManager, **kwargs):
-    day = int(dialog_manager.start_data.get("schedule_day"))
-    schedule_day = await get_day_schedule(day)
+    current_date = datetime.fromisoformat(dialog_manager.start_data.get("current_date"))
+    schedule_day = await get_day_schedule(current_date.isoweekday())
     lessons = []
     for lesson in schedule_day.get("lessons"):
         if lesson["classroom"] and lesson["building"]:
@@ -21,4 +21,5 @@ async def get_schedule_day(dialog_manager: DialogManager, **kwargs):
         )
         lessons.append(lesson)
     schedule_day["lessons"] = lessons
+    schedule_day["date_str"] = current_date.strftime("%d.%m")
     return schedule_day
