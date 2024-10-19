@@ -1,4 +1,5 @@
 from typing import Any
+from datetime import datetime, timedelta
 
 from app.mstimetables.api import request_mstimetables
 from app.mstimetables.utils import parse_classroom
@@ -12,7 +13,7 @@ DAYS = {
     6: "Суббота",
 }
 
-KICK_UUIDS = ("72", "73", "68", "5", "97", "20")
+KICK_UUIDS = ("72", "73", "68", "5", "97", "20", "98")
 
 
 async def get_lessons_from_mstimetables() -> list | None:
@@ -53,7 +54,7 @@ async def get_schedule_from_mstimetables() -> (
                 week[lesson["weekday"]] = {
                     "day": int(lesson["weekday"]),
                     "name": DAYS[int(lesson["weekday"])],
-                    "lessons": [],
+                    "lessons": {str(i): {"lesson_uuid": None} for i in range(1, 4)},
                 }
             classroom, building = None, None
             if lesson["cabinet"]:
@@ -61,13 +62,15 @@ async def get_schedule_from_mstimetables() -> (
             start_time = lesson['startTime']
             if lesson['startTime'] == "13:40":
                 start_time = "13:10"
-            week[lesson["weekday"]]["lessons"].append(
+            start_datetime = datetime.combine(datetime.min.date(), datetime.strptime(start_time, "%H:%M").time())
+            week[lesson["weekday"]]["lessons"][str(lesson["lesson"])] = (
                 {
                     "lesson_uuid": str(lesson["subject"]["id"]),
                     "name": lesson["subject"]["name"],
                     "building": building,
                     "classroom": classroom,
-                    "start_time": f'2024-01-01T{start_time}:00',
+                    "start_time": start_datetime,
+                    "end_time": start_datetime + timedelta(minutes=40),
                 }
             )
     week = [week[key] for key in sorted(week.keys())]
