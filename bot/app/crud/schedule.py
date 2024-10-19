@@ -53,7 +53,7 @@ async def sync_schedule_with_lessons_crud():
     lesson_collection = await mongo_get_collection(connection, "lessons")
     for schedule in schedule_collection.find():
         updated_lessons = schedule["lessons"]
-        for n, lesson in schedule["lessons"]:
+        for n, lesson in schedule["lessons"].items():
             lesson_uuid = lesson["lesson_uuid"]
             if lesson_uuid is not None:
                 matching_lesson = lesson_collection.find_one({"uuid": lesson_uuid})
