@@ -4,7 +4,6 @@ from aiogram_dialog.widgets.kbd import ScrollingGroup, Select, ListGroup, Column
 from aiogram_dialog.widgets.text import Format
 
 
-
 def column_lessons(on_click):
     return Column(
         Select(

@@ -1,6 +1,12 @@
-from datetime import datetime, timedelta, time
+from datetime import time
 
 from app.database import mongo_connection, mongo_get_collection
+
+
+async def is_schedule_filled():
+    connection = await mongo_connection()
+    schedule_collection = await mongo_get_collection(connection, "schedule")
+    return schedule_collection.count_documents({}) > 0
 
 
 async def get_all_schedule():
@@ -34,8 +40,8 @@ async def get_lesson_weekdays_by_uuid(lesson_uuid: str) -> list[int]:
     for day in schedule:
         for lesson in day.get("lessons"):
             if (
-                lesson.get("lesson_uuid") == lesson_uuid
-                and day.get("day") not in lesson_weekdays
+                    lesson.get("lesson_uuid") == lesson_uuid
+                    and day.get("day") not in lesson_weekdays
             ):
                 lesson_weekdays.append(day.get("day"))
     return lesson_weekdays
@@ -73,6 +79,4 @@ async def insert_schedule(schedule: list):
 async def get_first_last_lesson_time_by_day(day: int) -> (time, time):
     day = await get_day_schedule(day)
     lessons = day.get("lessons")
-    # TODO: Future migration needed (str <isoformat> -> datetime)
-    return datetime.fromisoformat(lessons[0].get("start_time")).time(), (datetime.fromisoformat(lessons[-1].get("start_time"))+timedelta(minutes=40)).time()
-
+    return lessons[0].get("start_time").time(), lessons[-1].get("end_time").time()

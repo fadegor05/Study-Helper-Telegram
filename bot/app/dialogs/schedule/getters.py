@@ -2,7 +2,7 @@ from datetime import datetime
 
 from aiogram_dialog import DialogManager
 
-from app.crud.schedule import get_all_schedule_sorted, get_day_schedule
+from app.crud.schedule import get_day_schedule
 
 
 async def get_schedule_day(dialog_manager: DialogManager, **kwargs):
@@ -15,7 +15,7 @@ async def get_schedule_day(dialog_manager: DialogManager, **kwargs):
         else:
             lesson.update(place="")
         lesson.update(
-            start_time=datetime.fromisoformat(lesson.get("start_time")).strftime(
+            start_time=lesson.get("start_time").strftime(
                 "%H:%M"
             )
         )

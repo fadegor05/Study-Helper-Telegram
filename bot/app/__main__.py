@@ -9,6 +9,7 @@ from apscheduler.triggers.cron import CronTrigger
 
 from app.apsched.hometask import hometask_notification
 from app.apsched.weather import update_weather
+from app.crud.schedule import delete_schedule, insert_schedule, is_schedule_filled
 from app.database import mongo_connection, mongo_init
 from aiogram_dialog import setup_dialogs
 from app.dialogs import get_dialogs
@@ -17,6 +18,7 @@ from app.core.config import TELEGRAM_TOKEN, REDIS_URL
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from app.migrations.migrations import mongo_migrate
+from app.mstimetables.service import get_schedule_from_mstimetables
 from app.openmeteo.service import update_weather_from_openmeteo
 
 
@@ -25,6 +27,12 @@ async def main() -> None:
     await mongo_init(connection)
 
     await mongo_migrate()
+
+    if not await is_schedule_filled():
+        schedule = await get_schedule_from_mstimetables()
+        if schedule:
+            await delete_schedule()
+            await insert_schedule(schedule)
 
     storage = RedisStorage.from_url(REDIS_URL)
     storage.key_builder.with_destiny = True
