@@ -22,7 +22,7 @@ async def on_chosen_schedule(c: CallbackQuery, widget: Button, manager: DialogMa
     while i < 7:
         for day in schedule:
             if today.isoweekday() == int(day.get("day")):
-                await manager.start(ScheduleMenu.info_schedule, {"current_date": datetime.combine(datetime.today(), datetime.min.time()).isoformat()})
+                await manager.start(ScheduleMenu.info_schedule, {"current_date": datetime.combine(today, datetime.min.time()).isoformat()})
                 return
         today += timedelta(days=1)
         i += 1
