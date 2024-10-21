@@ -94,7 +94,7 @@ async def on_chosen_soon_date(c: CallbackQuery, widget: Button, manager: DialogM
     lesson_weekdays = await get_lesson_weekdays_by_uuid(lesson_uuid)
     date = None
     now = datetime.now() + timedelta(days=1)
-    start_datetime = datetime.combine(datetime.today(), datetime.min.time())
+    start_datetime = datetime.combine(now.date(), datetime.min.time())
     end_datetime = start_datetime + timedelta(days=7)
 
     current_datetime = start_datetime
@@ -174,7 +174,7 @@ async def on_chosen_soon_edit_date(
     lesson_weekdays = await get_lesson_weekdays_by_uuid(lesson_uuid)
     date = None
     now = datetime.now() + timedelta(days=1)
-    start_datetime = datetime.combine(datetime.today(), datetime.min.time())
+    start_datetime = datetime.combine(now.date(), datetime.min.time())
     end_datetime = start_datetime + timedelta(days=7)
 
     current_datetime = start_datetime
