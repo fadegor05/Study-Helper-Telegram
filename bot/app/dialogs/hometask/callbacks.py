@@ -12,7 +12,7 @@ from app.crud.hometask import (
     update_hometask_task_by_uuid,
     update_hometask_date_by_uuid,
     hide_hometask_by_uuid, uncomplete_hometask_by_uuid_and_telegram_uuid, complete_hometask_by_uuid_and_telegram_uuid,
-    skip_hometask_by_uuid_and_telegram_uuid,
+    skip_hometask_by_uuid_and_telegram_uuid, unsuggest_hometask_by_uuid,
 )
 from app.crud.schedule import get_lesson_weekdays_by_uuid
 from app.crud.user import is_user_editor_by_telegram_id
@@ -76,9 +76,6 @@ async def skip_hometask_status(
 
 async def on_create_hometask(c: CallbackQuery, widget: Button, manager: DialogManager):
     user_id = manager.middleware_data.get("event_chat").id
-    if not await is_user_editor_by_telegram_id(user_id):
-        await c.answer("У вас недостаточно прав для этого ❌")
-        return
     await manager.start(HometaskCreate.lesson_hometask)
 
 
@@ -139,8 +136,14 @@ async def on_done_create_hometask(
     date = manager.dialog_data.get("date")
     task = manager.dialog_data.get("task")
     images = manager.dialog_data.get("images")
-    await create_hometask(lesson_uuid, task, datetime.fromisoformat(date).date(), images, user_id)
-    await c.answer("Задание было успешно добавлено ✅")
+    is_suggested = False
+    if not await is_user_editor_by_telegram_id(user_id):
+        is_suggested = True
+    await create_hometask(lesson_uuid, task, datetime.fromisoformat(date).date(), images, user_id, is_suggested)
+    if is_suggested:
+        await c.answer("Спасибо! Данное задание было предложено ✅")
+    else:
+        await c.answer("Задание было успешно добавлено ✅")
     await manager.done()
 
 
@@ -219,4 +222,13 @@ async def on_delete_confirm_hometask(
     hometask_uuid = manager.start_data.get("hometask_uuid")
     await hide_hometask_by_uuid(hometask_uuid)
     await c.answer("Задание было успешно удалено ✅")
+    await manager.done()
+
+
+async def on_accept_suggested_hometask(
+    c: CallbackQuery, widget: Button, manager: DialogManager
+):
+    hometask_uuid = manager.start_data.get("hometask_uuid")
+    await unsuggest_hometask_by_uuid(hometask_uuid)
+    await c.answer("Задание было успешно добавлено ✅")
     await manager.done()

@@ -21,6 +21,12 @@ def hometask_window():
             callbacks.on_create_hometask,
             when=utils.is_editor,
         ),
+        Button(
+            Const("📝 Предложить задание"),
+            "hometask_suggest_button",
+            callbacks.on_create_hometask,
+            when=utils.is_not_editor,
+        ),
         Cancel(Const("⬅️ Назад")),
         state=states.HometaskMenu.select_hometask,
         getter=getters.get_hometasks,
@@ -34,15 +40,22 @@ def hometask_info_window():
             "*{date} {lesson}*\n{status_str}\n\n{task}{materials_str}\n\n🔗 *Автор* @{author_username}{edited_str}{completed_by_str}"
         ),
         Button(
+            Const("✅ Принять"),
+            "accept_suggested",
+            callbacks.on_accept_suggested_hometask,
+            when=utils.is_suggested
+        ),
+        Button(
             Format("{status_button}"),
             "status_button",
             callbacks.change_hometask_status,
+            when=utils.is_not_suggested,
         ),
         Button(
             Format("{skip_button}"),
             "skip_button",
             callbacks.skip_hometask_status,
-            when=utils.is_not_completed,
+            when=utils.is_not_completed_and_not_suggested,
         ),
         Button(
             Const("✏️ Изменить задание"),
@@ -60,7 +73,7 @@ def hometask_info_window():
             Const("🗑️ Удалить"),
             "date_delete_button",
             callbacks.on_delete_hometask,
-            when=utils.is_editor,
+            when=utils.is_editor
         ),
         Cancel(Const("⬅️ Назад")),
         state=states.HometaskInfo.info_hometask,
@@ -70,7 +83,8 @@ def hometask_info_window():
 
 def hometask_lesson_window():
     return Window(
-        Const("*Выберите предмет, по которому вы хотите добавить домашнее задание* ✏️"),
+        Const("*Выберите предмет, по которому вы хотите добавить домашнее задание* ✏️", when=utils.is_editor),
+        Const("*Выберите предмет, по которому вы хотите предложить домашнее задание* ✏️", when=utils.is_not_editor),
         keyboards.paginated_lessons(callbacks.on_chosen_lesson),
         Cancel(Const("⬅️ Назад")),
         state=states.HometaskCreate.lesson_hometask,
@@ -80,7 +94,8 @@ def hometask_lesson_window():
 
 def hometask_date_window():
     return Window(
-        Const("*Выберите на какой день вы хотите добавить домашнее задание* 🗓️"),
+        Const("*Выберите на какой день вы хотите добавить домашнее задание* 🗓️", when=utils.is_editor),
+        Const("*Выберите на какой день вы хотите предложить домашнее задание* 🗓️", when=utils.is_not_editor),
         Const(
             "\n_Урока еще нет в расписании, учитывай это при выборе даты_ ⚠️",
             when=is_lesson_not_in_schedule,

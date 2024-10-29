@@ -36,6 +36,8 @@ async def get_hometasks(dialog_manager: DialogManager, **kwargs):
             status = "📦"
         elif status_id == 1:
             status = "✅"
+        if hometask.get("is_suggested"):
+            status = "📝"
         hometask.update(
             date=hometask_date.strftime("%d.%m"),
             status=status
@@ -94,6 +96,8 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
         status = "Выполнено ✅"
         status_button = "❌ Отменить выполнение"
         is_completed = True
+    if hometask.get("is_suggested"):
+        status = "Предложено 📝"
 
     materials = await get_materials_by_lesson_uuid(lesson.get("uuid"))
     materials_str = f"\n\n*Материалы* 📚\n" + "\n".join([f"[{material.get('name')}]({material.get('link')})" for material in materials]) if len(materials) > 0 else ""
@@ -115,6 +119,7 @@ async def get_hometask(dialog_manager: DialogManager, **kwargs):
         if editor_id and edited_at
         else "",
         "materials_str": materials_str,
+        "is_suggested": True if hometask.get("is_suggested") else False
     }
 
 

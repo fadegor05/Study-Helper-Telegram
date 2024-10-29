@@ -3,6 +3,7 @@ from uuid import uuid4
 from datetime import datetime, timedelta, date
 
 from app.crud.lesson import get_lesson_by_uuid
+from app.crud.user import is_user_editor_by_telegram_id
 from app.database import mongo_connection, mongo_get_collection
 
 
@@ -18,8 +19,15 @@ async def get_amount_hometasks_uncompleted(telegram_id: int):
         {
             f"statuses.{telegram_id}": {"$exists": False},
             "$or": [{"is_hidden": {"$exists": False}}, {"is_hidden": False}],
+            "is_suggested": {"$exists": False}
         }
     )
+
+
+async def unsuggest_hometask_by_uuid(hometask_uuid: str):
+    connection = await mongo_connection()
+    hometask_collection = await mongo_get_collection(connection, "hometasks")
+    hometask_collection.update_one({"uuid": hometask_uuid}, {"$unset": {"is_suggested": ""}})
 
 
 async def get_tomorrow_amount_hometasks_uncompleted(telegram_id: int):
@@ -33,9 +41,11 @@ async def get_tomorrow_amount_hometasks_uncompleted(telegram_id: int):
             f"statuses.{telegram_id}": {"$exists": False},
             "date": tomorrow,
             "$or": [{"is_hidden": {"$exists": False}}, {"is_hidden": False}],
+            "is_suggested": {"$exists": False}
         }
     )
     return uncompleted_hometasks
+
 
 async def get_hometasks_all_sorted(telegram_id: int):
     connection = await mongo_connection()
@@ -43,11 +53,21 @@ async def get_hometasks_all_sorted(telegram_id: int):
 
     tomorrow = (datetime.today() + timedelta(days=1)).date()
 
+    suggested = list(
+        hometask_collection.find(
+            {
+                "is_suggested": True,
+                "$or": [{"is_hidden": {"$exists": False}}, {"is_hidden": False}],
+            }
+        )
+    )
+
     uncompleted = list(
         hometask_collection.find(
             {
                 f"statuses.{telegram_id}": {"$exists": False},
                 "$or": [{"is_hidden": {"$exists": False}}, {"is_hidden": False}],
+                "is_suggested": {"$exists": False}
             }
         )
     )
@@ -57,6 +77,7 @@ async def get_hometasks_all_sorted(telegram_id: int):
             {
                 f"statuses.{telegram_id}": 1,
                 "$or": [{"is_hidden": {"$exists": False}}, {"is_hidden": False}],
+                "is_suggested": {"$exists": False}
             }
         )
     )
@@ -66,6 +87,7 @@ async def get_hometasks_all_sorted(telegram_id: int):
             {
                 f"statuses.{telegram_id}": 0,
                 "$or": [{"is_hidden": {"$exists": False}}, {"is_hidden": False}],
+                "is_suggested": {"$exists": False}
             }
         )
     )
@@ -77,11 +99,16 @@ async def get_hometasks_all_sorted(telegram_id: int):
         else:
             return (1, -task_date.toordinal())
 
+    suggested.sort(key=custom_sort)
     uncompleted.sort(key=custom_sort)
     completed.sort(key=custom_sort)
     skipped.sort(key=custom_sort)
 
-    sorted_hometasks = uncompleted + completed + skipped
+    sorted_hometasks = []
+
+    if await is_user_editor_by_telegram_id(telegram_id):
+        sorted_hometasks = suggested
+    sorted_hometasks += uncompleted + completed + skipped
 
     return sorted_hometasks
 
@@ -91,14 +118,16 @@ async def update_hometask_task_by_uuid(hometask_uuid: str, task: str, editor_id:
     hometask_collection = await mongo_get_collection(connection, "hometasks")
     hometask_collection.update_one(
         {"uuid": hometask_uuid},
-        {"$set": {"task": task, "edited_at": datetime.now() + timedelta(hours=1), "editor_id": editor_id, "statuses": {}}},
+        {"$set": {"task": task, "edited_at": datetime.now() + timedelta(hours=1), "editor_id": editor_id,
+                  "statuses": {}}},
     )
 
 
 async def update_hometask_date_by_uuid(hometask_uuid: str, hometask_date: date):
     connection = await mongo_connection()
     hometask_collection = await mongo_get_collection(connection, "hometasks")
-    hometask_collection.update_one({"uuid": hometask_uuid}, {"$set": {"date": datetime.combine(hometask_date, datetime.min.time()), "statuses": {}}})
+    hometask_collection.update_one({"uuid": hometask_uuid}, {
+        "$set": {"date": datetime.combine(hometask_date, datetime.min.time()), "statuses": {}}})
 
 
 async def get_hometasks_all():
@@ -110,8 +139,10 @@ async def get_hometasks_all():
 async def get_hometask_by_lesson_uuid_and_date(lesson_uuid: str, hometask_date: date):
     connection = await mongo_connection()
     hometask_collection = await mongo_get_collection(connection, "hometasks")
-    hometasks = hometask_collection.find_one({"lesson_uuid": lesson_uuid, "date": datetime.combine(hometask_date, datetime.min.time()),
-                                              "$or": [{"is_hidden": {"$exists": False}}, {"is_hidden": False}]})
+    hometasks = hometask_collection.find_one(
+        {"lesson_uuid": lesson_uuid, "date": datetime.combine(hometask_date, datetime.min.time()),
+         "$or": [{"is_hidden": {"$exists": False}}, {"is_hidden": False}],
+         "is_suggested": {"$exists": False}})
     return hometasks
 
 
@@ -131,23 +162,24 @@ async def hide_hometask_by_uuid(hometask_uuid: str):
 
 
 async def create_hometask(
-        lesson_uuid: str, task: str, hometask_date: date, images: List[str], author_id: int
+        lesson_uuid: str, task: str, hometask_date: date, images: List[str], author_id: int, is_suggested: bool = False
 ):
     connection = await mongo_connection()
     hometask_collection = await mongo_get_collection(connection, "hometasks")
     lesson = await get_lesson_by_uuid(lesson_uuid)
-    hometask_collection.insert_one(
-        {
-            "uuid": str(uuid4()),
-            "lesson_uuid": lesson_uuid,
-            "lesson": lesson.get("name"),
-            "task": task,
-            "date": datetime.combine(hometask_date, datetime.min.time()),
-            "statuses": {},
-            "images": images,
-            "author_id": author_id,
-        }
-    )
+    hometask_data = {
+        "uuid": str(uuid4()),
+        "lesson_uuid": lesson_uuid,
+        "lesson": lesson.get("name"),
+        "task": task,
+        "date": datetime.combine(hometask_date, datetime.min.time()),
+        "statuses": {},
+        "images": images,
+        "author_id": author_id,
+    }
+    if is_suggested:
+        hometask_data.update(is_suggested=is_suggested)
+    hometask_collection.insert_one(hometask_data)
 
 
 async def skip_hometask_by_uuid_and_telegram_uuid(hometask_uuid: str, telegram_uuid: int):
@@ -158,6 +190,7 @@ async def skip_hometask_by_uuid_and_telegram_uuid(hometask_uuid: str, telegram_u
         {"uuid": hometask_uuid}, {"$set": {f"statuses.{telegram_uuid}": 0}}
     )
 
+
 async def complete_hometask_by_uuid_and_telegram_uuid(hometask_uuid: str, telegram_uuid: int):
     connection = await mongo_connection()
     hometask_collection = await mongo_get_collection(connection, "hometasks")
@@ -165,6 +198,7 @@ async def complete_hometask_by_uuid_and_telegram_uuid(hometask_uuid: str, telegr
     hometask_collection.update_one(
         {"uuid": hometask_uuid}, {"$set": {f"statuses.{telegram_uuid}": 1}}
     )
+
 
 async def uncomplete_hometask_by_uuid_and_telegram_uuid(hometask_uuid: str, telegram_uuid: int):
     connection = await mongo_connection()
