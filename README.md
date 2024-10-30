@@ -62,12 +62,13 @@ uuid: str
 lesson_uuid: str
 lesson: str
 task: str
-date: str -> date (migration wanted)
+date: datetime
 stasuses: {int: int} (user_id : status)
 images: [str]
 author_id: int
 edited_at: str | None
 editor_id: int | None
+is_suggested: bool
 ```
 
 ```
@@ -94,8 +95,8 @@ lessons: [
     {
         name: str
         lesson_uuid: str
-        start_time: str -> time (migration wanted)
-        end_time: time (migration wanted)
+        start_time: datetime
+        end_time: datetime
         classroom: str
         building: str
     }
@@ -105,13 +106,13 @@ lessons: [
 ### weather
 
 ```
-date: str -> date (migration wanted)
+date: datetime
 morning_temperature: float
 morning_icon: str
-morning_datetime: str -> time (migration wanted)
+morning_datetime: dateime
 day_temperature: float
 day_icon: str
-day_datetime: str -> time (migration wanted)
+day_datetime: datetime
 ```
 
 ### materials
