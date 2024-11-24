@@ -26,10 +26,10 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            docker compose down
             cd ~/Study-Helper-Telegram
             git fetch
             git checkout ${{ secrets.MAIN_BRANCH }}
             git pull
             
-            docker compose down
             docker compose up -d --build
